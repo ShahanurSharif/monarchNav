@@ -16,7 +16,6 @@ export interface IMonarchNavApplicationCustomizerProperties {
   // This is an example; replace with your own property
   testMessage: string;
 }
-
 /** A Custom Action which can be run during execution of a Client Side Application */
 export default class MonarchNavApplicationCustomizer
   extends BaseApplicationCustomizer<IMonarchNavApplicationCustomizerProperties> {
