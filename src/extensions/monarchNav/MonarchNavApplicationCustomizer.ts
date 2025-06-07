@@ -2,36 +2,63 @@ import { Log } from '@microsoft/sp-core-library';
 import {
   BaseApplicationCustomizer
 } from '@microsoft/sp-application-base';
-import { Dialog } from '@microsoft/sp-dialog';
 
 import * as strings from 'MonarchNavApplicationCustomizerStrings';
 
 const LOG_SOURCE: string = 'MonarchNavApplicationCustomizer';
-/**
- * If your command set uses the ClientSideComponentProperties JSON input,
- * it will be deserialized into the BaseExtension.properties object.
- * You can define an interface to describe it.
- */
+
 export interface IMonarchNavApplicationCustomizerProperties {
-  // This is an example; replace with your own property
   testMessage: string;
 }
-/** A Custom Action which can be run during execution of a Client Side Application */
+
 export default class MonarchNavApplicationCustomizer
   extends BaseApplicationCustomizer<IMonarchNavApplicationCustomizerProperties> {
 
   public onInit(): Promise<void> {
     Log.info(LOG_SOURCE, `Initialized ${strings.Title}`);
 
-    let message: string = this.properties.testMessage;
-    if (!message) {
-      message = '(No properties were provided.)';
-    }
-
-    Dialog.alert(`Hello from ${strings.Title}:\n\n${message}`).catch(() => {
-      /* handle error */
-    });
+    // Hide spSiteHeader
+    this._hideSiteHeader();
+    
+    // Create MonarchNav in spTopPlaceholder
+    this._createMonarchNav();
 
     return Promise.resolve();
+  }
+
+  private _hideSiteHeader(): void {
+    const style = document.createElement('style');
+    style.textContent = `
+      #spSiteHeader {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  private _createMonarchNav(): void {
+    const topPlaceholder = document.getElementById('spTopPlaceholder');
+    if (topPlaceholder) {
+      const homeUrl = this.context.pageContext.web.absoluteUrl;
+      
+      topPlaceholder.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #0078d4; color: white;">
+          <a href="${homeUrl}" style="color: white; text-decoration: none; font-weight: bold;">
+            🏠 Home
+          </a>
+          <button id="monarchNavCog" style="background: none; border: none; color: white; font-size: 16px; cursor: pointer;">
+            ⚙️
+          </button>
+        </div>
+      `;
+
+      // Add cog button click handler
+      const cogButton = document.getElementById('monarchNavCog');
+      if (cogButton) {
+        cogButton.addEventListener('click', () => {
+          alert('Cog button clicked!');
+        });
+      }
+    }
   }
 }
