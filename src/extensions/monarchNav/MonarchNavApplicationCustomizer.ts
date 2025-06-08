@@ -10,6 +10,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import Container from './components/Container'
 import * as strings from 'MonarchNavApplicationCustomizerStrings';
+import { MonarchNavConfigService } from './MonarchNavConfigService';
 
 const LOG_SOURCE: string = 'MonarchNavApplicationCustomizer';
 
@@ -29,8 +30,11 @@ export default class MonarchNavApplicationCustomizer
 
   private _topPlaceholder: PlaceholderContent | undefined;
 
-  public onInit(): Promise<void> {
+  public async onInit(): Promise<void> {
     Log.info(LOG_SOURCE, `Initialized ${strings.Title}`);
+
+    // Step 1: Ensure config file exists
+    await MonarchNavConfigService.ensureConfigFile(this.context);
 
     let message: string = this.properties.testMessage;
     if (!message) {

@@ -1,0 +1,10 @@
+{
+    "backgroundColor": "#ffffff",
+    "textColor": "#000000",
+    "items": [
+        {
+            "name": "Home",
+            "link":""
+        }
+    ]
+}
