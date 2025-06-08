@@ -1,6 +1,6 @@
 import * as React from "react";
 import { IContainerProps } from "./IContainerProps";
-import { IconButton, Callout, Toggle } from "@fluentui/react";
+import { IconButton, Callout, Toggle, ColorPicker } from "@fluentui/react";
 
 export interface IReactItemState {
     containerItems: {
@@ -10,7 +10,13 @@ export interface IReactItemState {
 
 export default class Container extends React.Component<
     IContainerProps,
-    IReactItemState & { showEditActions: boolean; showSettingsCallout: boolean; spHeaderVisible: boolean }
+    IReactItemState & {
+        showEditActions: boolean;
+        showSettingsCallout: boolean;
+        spHeaderVisible: boolean;
+        monarchBgColor: string;
+        monarchFontColor: string;
+    }
 > {
     private settingsButtonRef = React.createRef<HTMLButtonElement>();
     constructor(props: IContainerProps) {
@@ -24,27 +30,29 @@ export default class Container extends React.Component<
             showEditActions: false,
             showSettingsCallout: false,
             spHeaderVisible: false, // default is false
+            monarchBgColor: "#0078d4",
+            monarchFontColor: "#ffffff",
         };
     }
     public componentDidMount(): void {
         // Always hide spSiteHeader on mount (default false)
-        const spHeader = document.getElementById('spSiteHeader');
+        const spHeader = document.getElementById("spSiteHeader");
         if (spHeader) {
-            spHeader.style.display = 'none';
+            spHeader.style.display = "none";
         } else {
             setTimeout(() => {
-                const delayedHeader = document.getElementById('spSiteHeader');
+                const delayedHeader = document.getElementById("spSiteHeader");
                 if (delayedHeader) {
-                    delayedHeader.style.display = 'none';
+                    delayedHeader.style.display = "none";
                 }
             }, 500);
         }
         this.fetchItemsFromList();
     }
     private _setSpHeaderVisibility = (visible: boolean): void => {
-        const spHeader = document.getElementById('spSiteHeader');
+        const spHeader = document.getElementById("spSiteHeader");
         if (spHeader) {
-            spHeader.style.display = visible ? '' : 'none';
+            spHeader.style.display = visible ? "" : "none";
         }
         this.setState({ spHeaderVisible: visible });
     };
@@ -54,9 +62,10 @@ export default class Container extends React.Component<
         return (
             <div>
                 <div
+                    id="monarchMainNavHeader"
                     style={{
-                        backgroundColor: "#0078d4",
-                        color: "white",
+                        backgroundColor: this.state.monarchBgColor,
+                        color: this.state.monarchFontColor,
                         padding: "12px 20px",
                         display: "flex",
                         justifyContent: "space-between",
@@ -70,6 +79,7 @@ export default class Container extends React.Component<
                 >
                     {/* menu items and edit button */}
                     <div
+                        id="monarchMenuControls"
                         style={{
                             display: "flex",
                             alignItems: "center",
@@ -83,17 +93,21 @@ export default class Container extends React.Component<
                                     style={{
                                         background: "none",
                                         border: "none",
-                                        color: "white",
+                                        color: this.state.monarchFontColor,
                                         fontSize: 18,
                                         cursor: "pointer",
                                         padding: "8px 8px",
                                         borderRadius: 4,
-                                        transition: "background-color 0.2s ease",
+                                        transition:
+                                            "background-color 0.2s ease",
                                     }}
                                     title="Settings"
                                     aria-label="Settings"
                                     onClick={() => {
-                                        this.setState({ showSettingsCallout: !this.state.showSettingsCallout });
+                                        this.setState({
+                                            showSettingsCallout:
+                                                !this.state.showSettingsCallout,
+                                        });
                                     }}
                                 >
                                     <span role="img" aria-label="Settings">
@@ -103,21 +117,85 @@ export default class Container extends React.Component<
                                 {this.state.showSettingsCallout && (
                                     <Callout
                                         target={this.settingsButtonRef.current}
-                                        onDismiss={() => this.setState({ showSettingsCallout: false })}
+                                        onDismiss={() =>
+                                            this.setState({
+                                                showSettingsCallout: false,
+                                            })
+                                        }
                                         setInitialFocus
                                         styles={{
                                             root: {
-                                                maxWidth: 300,
+                                                maxWidth: 320,
                                                 padding: 16,
-                                                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                                                boxShadow:
+                                                    "0 2px 4px rgba(0,0,0,0.1)",
                                             },
                                         }}
                                     >
+                                        {/* callout Settings content */}
                                         <Toggle
                                             label="Show SharePoint Header"
                                             checked={this.state.spHeaderVisible}
-                                            onChange={(_e, checked) => this._setSpHeaderVisibility(!!checked)}
+                                            onChange={(_e, checked) =>
+                                                this._setSpHeaderVisibility(
+                                                    !!checked
+                                                )
+                                            }
                                         />
+                                        {/* Background color picker */}
+                                        <div style={{ marginTop: 16 }}>
+                                            <div
+                                                style={{
+                                                    fontWeight: 600,
+                                                    marginBottom: 4,
+                                                }}
+                                            >
+                                                Header Background Color
+                                            </div>
+                                            <ColorPicker
+                                                color={
+                                                    this.state.monarchBgColor
+                                                }
+                                                onChange={(
+                                                    _ev,
+                                                    colorObj: { str: string }
+                                                ) => {
+                                                    this.setState({
+                                                        monarchBgColor:
+                                                            colorObj.str,
+                                                    });
+                                                }}
+                                                alphaType="none"
+                                                showPreview={true}
+                                            />
+                                        </div>
+                                        {/* Font color picker */}
+                                        <div style={{ marginTop: 16 }}>
+                                            <div
+                                                style={{
+                                                    fontWeight: 600,
+                                                    marginBottom: 4,
+                                                }}
+                                            >
+                                                Menu Items Font Color
+                                            </div>
+                                            <ColorPicker
+                                                color={
+                                                    this.state.monarchFontColor
+                                                }
+                                                onChange={(
+                                                    _ev,
+                                                    colorObj: { str: string }
+                                                ) => {
+                                                    this.setState({
+                                                        monarchFontColor:
+                                                            colorObj.str,
+                                                    });
+                                                }}
+                                                alphaType="none"
+                                                showPreview={true}
+                                            />
+                                        </div>
                                     </Callout>
                                 )}
                                 <button
@@ -131,7 +209,8 @@ export default class Container extends React.Component<
                                         padding: "8px 16px",
                                         borderRadius: 4,
                                         marginRight: 4,
-                                        transition: "background-color 0.2s ease",
+                                        transition:
+                                            "background-color 0.2s ease",
                                     }}
                                     title="Add/Edit Navigation"
                                     aria-label="Add/Edit Navigation"
@@ -145,35 +224,43 @@ export default class Container extends React.Component<
                                 </button>
                             </>
                         )}
-                        <button
-                            style={{
-                                background: "none",
-                                border: "none",
-                                color: "white",
-                                fontSize: 18,
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                padding: "8px 16px",
-                                borderRadius: 4,
-                                transition: "background-color 0.2s ease",
-                            }}
-                            title="Home"
-                            aria-label="Home"
-                            onClick={() => {
-                                window.location.href = homeUrl;
-                            }}
+                        <div
+                            id="monarchMenuItems"
+                            style={{ color: this.state.monarchFontColor }}
                         >
-                            Home
-                        </button>
+                            <button
+                                style={{
+                                    background: "none",
+                                    border: "none",
+                                    color: this.state.monarchFontColor,
+                                    fontSize: 18,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                    padding: "8px 16px",
+                                    borderRadius: 4,
+                                    transition: "background-color 0.2s ease",
+                                }}
+                                title="Home"
+                                aria-label="Home"
+                                onClick={() => {
+                                    window.location.href = homeUrl;
+                                }}
+                            >
+                                Home
+                            </button>
+                        </div>
                         <IconButton
                             iconProps={{ iconName: "Edit" }}
                             title="Edit"
                             ariaLabel="Edit"
-                            styles={{ root: { color: "white", background: "none" } }}
+                            styles={{
+                                root: { color: "white", background: "none" },
+                            }}
                             onClick={() => {
                                 this.setState({
-                                    showEditActions: !this.state.showEditActions,
-                                    showSettingsCallout: false
+                                    showEditActions:
+                                        !this.state.showEditActions,
+                                    showSettingsCallout: false,
                                 });
                             }}
                         />
