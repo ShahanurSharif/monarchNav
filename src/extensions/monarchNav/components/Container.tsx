@@ -16,6 +16,7 @@ export default class Container extends React.Component<
         spHeaderVisible: boolean;
         monarchBgColor: string;
         monarchFontColor: string;
+        monarchFontSize: number; // <-- Add font size to state
     }
 > {
     private settingsButtonRef = React.createRef<HTMLButtonElement>();
@@ -32,6 +33,7 @@ export default class Container extends React.Component<
             spHeaderVisible: false, // default is false
             monarchBgColor: "#0078d4",
             monarchFontColor: "#ffffff",
+            monarchFontSize: 18, // <-- Default font size
         };
     }
     public componentDidMount(): void {
@@ -196,6 +198,33 @@ export default class Container extends React.Component<
                                                 showPreview={true}
                                             />
                                         </div>
+                                        {/* Font size slider */}
+                                        <div style={{ marginTop: 16 }}>
+                                            <div
+                                                style={{
+                                                    fontWeight: 600,
+                                                    marginBottom: 4,
+                                                }}
+                                            >
+                                                Menu Items Font Size
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min={12}
+                                                max={32}
+                                                step={1}
+                                                value={this.state.monarchFontSize}
+                                                onChange={e =>
+                                                    this.setState({
+                                                        monarchFontSize: Number(e.target.value),
+                                                    })
+                                                }
+                                                style={{ width: "100%" }}
+                                            />
+                                            <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
+                                                {this.state.monarchFontSize}px
+                                            </div>
+                                        </div>
                                     </Callout>
                                 )}
                                 <button
@@ -226,14 +255,17 @@ export default class Container extends React.Component<
                         )}
                         <div
                             id="monarchMenuItems"
-                            style={{ color: this.state.monarchFontColor }}
+                            style={{
+                                color: this.state.monarchFontColor,
+                                fontSize: this.state.monarchFontSize, // <-- Apply font size here
+                            }}
                         >
                             <button
                                 style={{
                                     background: "none",
                                     border: "none",
                                     color: this.state.monarchFontColor,
-                                    fontSize: 18,
+                                    fontSize: this.state.monarchFontSize, // <-- Apply font size to button
                                     fontWeight: 600,
                                     cursor: "pointer",
                                     padding: "8px 16px",
