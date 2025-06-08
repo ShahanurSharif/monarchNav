@@ -6,7 +6,7 @@
     "default": {
       "pageUrl": "https://monarch360demo.sharepoint.com/sites/shan",
       "customActions": {
-        "10a820f2-c871-4b0c-8a70-03c6c1d7c1eb": {
+        "99e2cc8b-a0a9-4b8b-9cd3-b80abd2aef49": {
           "location": "ClientSideExtension.ApplicationCustomizer",
           "properties": {
             "testMessage": "Test message"
@@ -17,7 +17,7 @@
     "monarchNav": {
       "pageUrl": "https://monarch360demo.sharepoint.com/sites/shan",
       "customActions": {
-        "10a820f2-c871-4b0c-8a70-03c6c1d7c1eb": {
+        "99e2cc8b-a0a9-4b8b-9cd3-b80abd2aef49": {
           "location": "ClientSideExtension.ApplicationCustomizer",
           "properties": {
             "testMessage": "Test message"

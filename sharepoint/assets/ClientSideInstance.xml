@@ -3,7 +3,7 @@
     <ClientSideComponentInstance
         Title="MonarchNav"
         Location="ClientSideExtension.ApplicationCustomizer"
-        ComponentId="10a820f2-c871-4b0c-8a70-03c6c1d7c1eb"
+        ComponentId="99e2cc8b-a0a9-4b8b-9cd3-b80abd2aef49"
         Properties="{&quot;testMessage&quot;:&quot;Test message&quot;}">
     </ClientSideComponentInstance>
 </Elements>

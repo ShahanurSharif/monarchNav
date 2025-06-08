@@ -1,64 +1,71 @@
 import { Log } from '@microsoft/sp-core-library';
 import {
-  BaseApplicationCustomizer
+  BaseApplicationCustomizer,
+  PlaceholderName,
+  PlaceholderContent
 } from '@microsoft/sp-application-base';
+import { Dialog } from '@microsoft/sp-dialog';
 
+import * as React from 'react';
+import * as ReactDom from 'react-dom';
+import Container from './components/Container'
 import * as strings from 'MonarchNavApplicationCustomizerStrings';
 
 const LOG_SOURCE: string = 'MonarchNavApplicationCustomizer';
 
+/**
+ * If your command set uses the ClientSideComponentProperties JSON input,
+ * it will be deserialized into the BaseExtension.properties object.
+ * You can define an interface to describe it.
+ */
 export interface IMonarchNavApplicationCustomizerProperties {
+  // This is an example; replace with your own property
   testMessage: string;
 }
 
+/** A Custom Action which can be run during execution of a Client Side Application */
 export default class MonarchNavApplicationCustomizer
   extends BaseApplicationCustomizer<IMonarchNavApplicationCustomizerProperties> {
+
+  private _topPlaceholder: PlaceholderContent | undefined;
 
   public onInit(): Promise<void> {
     Log.info(LOG_SOURCE, `Initialized ${strings.Title}`);
 
-    // Hide spSiteHeader
-    this._hideSiteHeader();
+    let message: string = this.properties.testMessage;
+    if (!message) {
+      message = '(No properties were provided.)';
+    }
+
+    Dialog.alert(`Hello from ${strings.Title}:\n\n${message}`).catch(() => {
+      /* handle error */
+    });
+
+    const element: React.ReactElement = React.createElement(
+      Container, 
+      {
+        context: this.context
+      }
+    );
+
+    const topPlaceholder = this.context.placeholderProvider.tryCreateContent(
+      PlaceholderName.Top
+    );
     
-    // Create MonarchNav in spTopPlaceholder
-    this._createMonarchNav();
+    if (topPlaceholder) {
+      this._topPlaceholder = topPlaceholder;
+      ReactDom.render(
+        element,
+        topPlaceholder.domElement
+      );
+    }
 
     return Promise.resolve();
   }
 
-  private _hideSiteHeader(): void {
-    const style = document.createElement('style');
-    style.textContent = `
-      #spSiteHeader {
-        display: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  private _createMonarchNav(): void {
-    const topPlaceholder = document.getElementById('spTopPlaceholder');
-    if (topPlaceholder) {
-      const homeUrl = this.context.pageContext.web.absoluteUrl;
-      
-      topPlaceholder.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #0078d4; color: white;">
-          <a href="${homeUrl}" style="color: white; text-decoration: none; font-weight: bold;">
-            🏠 Home
-          </a>
-          <button id="monarchNavCog" style="background: none; border: none; color: white; font-size: 16px; cursor: pointer;">
-            ⚙️
-          </button>
-        </div>
-      `;
-
-      // Add cog button click handler
-      const cogButton = document.getElementById('monarchNavCog');
-      if (cogButton) {
-        cogButton.addEventListener('click', () => {
-          alert('Cog button clicked!');
-        });
-      }
+  public onDispose(): void {
+    if (this._topPlaceholder && this._topPlaceholder.domElement) {
+      ReactDom.unmountComponentAtNode(this._topPlaceholder.domElement);
     }
   }
 }

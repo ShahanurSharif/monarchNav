@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
     "name": "monarch-nav-client-side-solution",
-    "id": "513d5688-1820-4f32-843c-aea6e19b81b4",
+    "id": "4cd29abd-f439-4525-acca-f7849d4e3620",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
@@ -16,10 +16,10 @@
     },
     "metadata": {
       "shortDescription": {
-        "default": "monarchNav description"
+        "default": "monarch-nav description"
       },
       "longDescription": {
-        "default": "monarchNav description"
+        "default": "monarch-nav description"
       },
       "screenshotPaths": [],
       "videoUrl": "",
@@ -29,7 +29,7 @@
       {
         "title": "Application Extension - Deployment of custom action",
         "description": "Deploys a custom action with ClientSideComponentId association",
-        "id": "01780dd1-21c2-472b-a308-7269977d0039",
+        "id": "7c7c26cf-e427-4095-afad-7fce1ca277fa",
         "version": "1.0.0.0",
         "assets": {
           "elementManifests": [

@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-extension-manifest.schema.json",
 
-  "id": "10a820f2-c871-4b0c-8a70-03c6c1d7c1eb",
+  "id": "99e2cc8b-a0a9-4b8b-9cd3-b80abd2aef49",
   "alias": "MonarchNavApplicationCustomizer",
   "componentType": "Extension",
   "extensionType": "ApplicationCustomizer",
