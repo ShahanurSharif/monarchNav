@@ -32,20 +32,6 @@ export default class MonarchNavApplicationCustomizer
   public onInit(): Promise<void> {
     Log.info(LOG_SOURCE, `Initialized ${strings.Title}`);
 
-    // Step 1: Hide the SharePoint top navigation bar
-    const spHeader = document.getElementById('spSiteHeader');
-    if (spHeader) {
-      spHeader.style.display = 'none';
-    } else {
-      // If not found, try again after a short delay (in case header loads late)
-      setTimeout(() => {
-        const delayedHeader = document.getElementById('spSiteHeader');
-        if (delayedHeader) {
-          delayedHeader.style.display = 'none';
-        }
-      }, 500);
-    }
-
     let message: string = this.properties.testMessage;
     if (!message) {
       message = '(No properties were provided.)';
