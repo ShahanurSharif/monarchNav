@@ -4,11 +4,47 @@ import { BaseApplicationCustomizer } from '@microsoft/sp-application-base';
 
 const LOG_SOURCE: string = 'MonarchNavConfigService';
 
-const DEFAULT_CONFIG = {
+export interface IMonarchNavItem {
+  name: string;
+  link: string;
+  children?: IMonarchNavItem[];
+}
+
+export interface IMonarchNavConfig {
+  themes: {
+    backgroundColor: string;
+    textColor: string;
+    is_sp_header: boolean;
+    items_font_size: string;
+  };
+  items: IMonarchNavItem[];
+}
+
+const DEFAULT_CONFIG: IMonarchNavConfig = {
+  themes: {
+    backgroundColor: "#ffffff",
+    textColor: "#000000",
+    is_sp_header: false,
+    items_font_size: "18px"
+  },
   items: [
     {
       name: "Home",
       link: ""
+    },
+    {
+      name: "Home",
+      link: "",
+      children: [
+        {
+          name: "Sub Item 1",
+          link: ""
+        },
+        {
+          name: "Sub Item 2", 
+          link: ""
+        }
+      ]
     }
   ]
 };

@@ -225,6 +225,54 @@ export default class Container extends React.Component<
                                                 {this.state.monarchFontSize}px
                                             </div>
                                         </div>
+                                        {/* Action buttons */}
+                                        <div style={{ 
+                                            marginTop: 20, 
+                                            display: "flex", 
+                                            gap: 8, 
+                                            justifyContent: "flex-end" 
+                                        }}>
+                                            <button
+                                                style={{
+                                                    backgroundColor: "#f3f2f1",
+                                                    color: "#323130",
+                                                    border: "1px solid #d2d0ce",
+                                                    borderRadius: 2,
+                                                    padding: "6px 16px",
+                                                    fontSize: 14,
+                                                    cursor: "pointer",
+                                                    fontWeight: 400
+                                                }}
+                                                onClick={() => {
+                                                    this.setState({
+                                                        showSettingsCallout: false
+                                                    });
+                                                }}
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                style={{
+                                                    backgroundColor: "#0078d4",
+                                                    color: "#ffffff",
+                                                    border: "1px solid #0078d4",
+                                                    borderRadius: 2,
+                                                    padding: "6px 16px",
+                                                    fontSize: 14,
+                                                    cursor: "pointer",
+                                                    fontWeight: 600
+                                                }}
+                                                onClick={() => {
+                                                    // Save functionality will be added later
+                                                    alert("Settings saved!");
+                                                    this.setState({
+                                                        showSettingsCallout: false
+                                                    });
+                                                }}
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
                                     </Callout>
                                 )}
                                 <button
