@@ -4,13 +4,11 @@ import {
   PlaceholderName,
   PlaceholderContent
 } from '@microsoft/sp-application-base';
-import { Dialog } from '@microsoft/sp-dialog';
 
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import Container from './components/Container'
-import * as strings from 'MonarchNavApplicationCustomizerStrings';
-import { MonarchNavConfigService } from './MonarchNavConfigService';
+import { MonarchNavConfigService, IMonarchNavConfig } from './MonarchNavConfigService';
 
 const LOG_SOURCE: string = 'MonarchNavApplicationCustomizer';
 
@@ -31,37 +29,36 @@ export default class MonarchNavApplicationCustomizer
   private _topPlaceholder: PlaceholderContent | undefined;
 
   public async onInit(): Promise<void> {
-    Log.info(LOG_SOURCE, `Initialized ${strings.Title}`);
-
-    // Step 1: Ensure config file exists
-    await MonarchNavConfigService.ensureConfigFile(this.context);
-
-    let message: string = this.properties.testMessage;
-    if (!message) {
-      message = '(No properties were provided.)';
-    }
-
-    Dialog.alert(`Hello from ${strings.Title}:\n\n${message}`).catch(() => {
-      /* handle error */
-    });
-
-    const element: React.ReactElement = React.createElement(
-      Container, 
-      {
-        context: this.context
-      }
-    );
-
-    const topPlaceholder = this.context.placeholderProvider.tryCreateContent(
-      PlaceholderName.Top
-    );
-    
-    if (topPlaceholder) {
-      this._topPlaceholder = topPlaceholder;
-      ReactDom.render(
-        element,
-        topPlaceholder.domElement
+    try {
+      Log.info(LOG_SOURCE, "Initializing MonarchNav extension...");
+      
+      // Ensure config file exists
+      await MonarchNavConfigService.ensureConfigFile(this.context);
+      
+      // Load configuration from SharePoint
+      const config: IMonarchNavConfig = await MonarchNavConfigService.loadConfig(this.context);
+      
+      // Create React element with loaded configuration
+      const element: React.ReactElement = React.createElement(
+        Container,
+        {
+          context: this.context,
+          config: config
+        }
       );
+
+      // Render the extension
+      const topPlaceholder = this.context.placeholderProvider.tryCreateContent(
+        PlaceholderName.Top
+      );
+
+      if (topPlaceholder) {
+        this._topPlaceholder = topPlaceholder;
+        ReactDom.render(element, topPlaceholder.domElement);
+      }
+
+    } catch (error) {
+      Log.error(LOG_SOURCE, error as Error);
     }
 
     return Promise.resolve();

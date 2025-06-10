@@ -7,6 +7,7 @@ const LOG_SOURCE: string = 'MonarchNavConfigService';
 export interface IMonarchNavItem {
   name: string;
   link: string;
+  target?: string;
   children?: IMonarchNavItem[];
 }
 
@@ -118,6 +119,93 @@ export class MonarchNavConfigService {
     } catch (error) {
       console.error('Error creating config file:', error);
       Log.error(LOG_SOURCE, error as Error);
+    }
+  }
+
+  /**
+   * Load configuration from SharePoint Site Assets
+   * @param context SPFx extension context
+   * @returns Promise<IMonarchNavConfig> Configuration object
+   */
+  public static async loadConfig(
+    context: BaseApplicationCustomizer<unknown>["context"]
+  ): Promise<IMonarchNavConfig> {
+    try {
+      const siteUrl = context.pageContext.web.absoluteUrl;
+      const serverRelativeUrl = `${context.pageContext.web.serverRelativeUrl.replace(/\/$/, '')}/SiteAssets`;
+      const fileUrl = `${serverRelativeUrl}/monarchNavConfig.json`;
+      
+      Log.info(LOG_SOURCE, `Loading configuration from: ${fileUrl}`);
+      
+      const getUrl = `${siteUrl}/_api/web/GetFileByServerRelativeUrl('${fileUrl}')/$value`;
+      
+      const response: SPHttpClientResponse = await context.spHttpClient.get(
+        getUrl,
+        SPHttpClient.configurations.v1
+      );
+
+      if (response.ok) {
+        const configText = await response.text();
+        const config: IMonarchNavConfig = JSON.parse(configText);
+        
+        Log.info(LOG_SOURCE, "Configuration loaded successfully");
+        return config;
+        
+      } else {
+        Log.warn(LOG_SOURCE, `Failed to load config: ${response.status}`);
+        throw new Error(`Failed to load configuration: ${response.status}`);
+      }
+      
+    } catch (error) {
+      Log.error(LOG_SOURCE, error as Error);
+      
+      // Return default configuration as fallback
+      Log.info(LOG_SOURCE, "Using default configuration as fallback");
+      return DEFAULT_CONFIG;
+    }
+  }
+
+  /**
+   * Save configuration to SharePoint Site Assets
+   * @param context SPFx extension context
+   * @param config Configuration object to save
+   */
+  public static async saveConfig(
+    context: BaseApplicationCustomizer<unknown>["context"], 
+    config: IMonarchNavConfig
+  ): Promise<void> {
+    try {
+      Log.info(LOG_SOURCE, "Saving configuration to SharePoint...");
+      
+      const siteUrl = context.pageContext.web.absoluteUrl;
+      const serverRelativeUrl = `${context.pageContext.web.serverRelativeUrl.replace(/\/$/, '')}/SiteAssets`;
+      
+      // Convert config to JSON string with proper formatting
+      const configJson = JSON.stringify(config, null, 4);
+      const blob = new Blob([configJson], { type: 'application/json' });
+      
+      // Upload the updated file (overwrite existing)
+      const uploadUrl = `${siteUrl}/_api/web/GetFolderByServerRelativeUrl('${serverRelativeUrl}')/Files/add(overwrite=true,url='monarchNavConfig.json')`;
+      
+      const response: SPHttpClientResponse = await context.spHttpClient.post(
+        uploadUrl,
+        SPHttpClient.configurations.v1,
+        {
+          body: blob
+        }
+      );
+
+      if (response.ok) {
+        Log.info(LOG_SOURCE, "Configuration saved successfully");
+      } else {
+        const errorData = await response.json();
+        Log.error(LOG_SOURCE, new Error(`Failed to save config: ${JSON.stringify(errorData)}`));
+        throw new Error("Failed to save configuration");
+      }
+      
+    } catch (error) {
+      Log.error(LOG_SOURCE, error as Error);
+      throw error;
     }
   }
 }

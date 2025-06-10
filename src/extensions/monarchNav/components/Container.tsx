@@ -1,6 +1,7 @@
 import * as React from "react";
 import { IContainerProps } from "./IContainerProps";
 import { IconButton, Callout, Toggle, ColorPicker } from "@fluentui/react";
+import { MonarchNavConfigService, IMonarchNavConfig } from "../MonarchNavConfigService";
 
 export interface IReactItemState {
     containerItems: {
@@ -30,34 +31,107 @@ export default class Container extends React.Component<
             ],
             showEditActions: false,
             showSettingsCallout: false,
-            spHeaderVisible: false, // default is false
-            monarchBgColor: "#0078d4",
-            monarchFontColor: "#ffffff",
-            monarchFontSize: 18, // <-- Default font size
+            spHeaderVisible: props.config?.themes?.is_sp_header ?? false,
+            monarchBgColor: props.config?.themes?.backgroundColor ?? "#0078d4",
+            monarchFontColor: props.config?.themes?.textColor ?? "#ffffff",
+            monarchFontSize: props.config?.themes?.items_font_size 
+                ? parseInt(props.config.themes.items_font_size.replace('px', '')) 
+                : 18,
         };
     }
     public componentDidMount(): void {
-        // Always hide spSiteHeader on mount (default false)
-        const spHeader = document.getElementById("spSiteHeader");
-        if (spHeader) {
-            spHeader.style.display = "none";
-        } else {
-            setTimeout(() => {
-                const delayedHeader = document.getElementById("spSiteHeader");
-                if (delayedHeader) {
-                    delayedHeader.style.display = "none";
-                }
-            }, 500);
-        }
+        // Apply SharePoint header visibility based on configuration
+        this._applySpHeaderVisibility(this.state.spHeaderVisible);
         this.fetchItemsFromList();
     }
     private _setSpHeaderVisibility = (visible: boolean): void => {
-        const spHeader = document.getElementById("spSiteHeader");
-        if (spHeader) {
-            spHeader.style.display = visible ? "" : "none";
-        }
+        this._applySpHeaderVisibility(visible);
         this.setState({ spHeaderVisible: visible });
     };
+
+    private _applySpHeaderVisibility = (visible: boolean): void => {
+        // Try multiple possible SharePoint header element IDs
+        const possibleIds = ['spSiteHeader', 'spHeader', 'SuiteNavWrapper'];
+        
+        for (const id of possibleIds) {
+            const spHeader = document.getElementById(id);
+            if (spHeader) {
+                spHeader.style.display = visible ? "" : "none";
+                console.log(`Applied SharePoint header visibility (${visible}) to element: ${id}`);
+                return;
+            }
+        }
+        
+        // If no element found immediately, try with a delay
+        setTimeout(() => {
+            for (const id of possibleIds) {
+                const spHeader = document.getElementById(id);
+                if (spHeader) {
+                    spHeader.style.display = visible ? "" : "none";
+                    console.log(`Applied SharePoint header visibility (${visible}) to element: ${id} (delayed)`);
+                    return;
+                }
+            }
+            console.warn('SharePoint header element not found with any of the expected IDs:', possibleIds);
+        }, 500);
+    };
+
+    /**
+     * Handle save button click - Write current state to SharePoint
+     */
+    private _handleSave = async (): Promise<void> => {
+        try {
+            const updatedConfig: IMonarchNavConfig = {
+                themes: {
+                    backgroundColor: this.state.monarchBgColor,
+                    textColor: this.state.monarchFontColor,
+                    is_sp_header: this.state.spHeaderVisible,
+                    items_font_size: `${this.state.monarchFontSize}px`
+                },
+                items: this.props.config?.items ?? []
+            };
+
+            await MonarchNavConfigService.saveConfig(this.props.context, updatedConfig);
+            
+            alert("Settings saved successfully!");
+            this.setState({ showSettingsCallout: false });
+            
+        } catch (error) {
+            console.error("Error saving configuration:", error);
+            alert("Error saving settings. Please try again.");
+        }
+    };
+
+    /**
+     * Handle cancel button click - Load previous values from SharePoint without saving
+     */
+    private _handleCancel = async (): Promise<void> => {
+        try {
+            console.log("Loading previous configuration from SharePoint...");
+            
+            // Load current saved configuration from SharePoint
+            const savedConfig = await MonarchNavConfigService.loadConfig(this.props.context);
+            
+            // Reset UI state to saved configuration values
+            this.setState({
+                monarchBgColor: savedConfig.themes.backgroundColor,
+                monarchFontColor: savedConfig.themes.textColor,
+                spHeaderVisible: savedConfig.themes.is_sp_header,
+                monarchFontSize: parseInt(savedConfig.themes.items_font_size.replace('px', '')),
+                showSettingsCallout: false
+            });
+            
+            console.log("Configuration reset to saved values");
+            
+        } catch (error) {
+            console.error("Error loading previous configuration:", error);
+            
+            // Fallback: Close callout and keep current changes
+            alert("Could not load previous settings. Closing settings panel.");
+            this.setState({ showSettingsCallout: false });
+        }
+    };
+
     public fetchItemsFromList(): void {}
     public render(): React.ReactElement<IContainerProps> {
         const homeUrl = this.props.context.pageContext.web.absoluteUrl;
@@ -243,11 +317,7 @@ export default class Container extends React.Component<
                                                     cursor: "pointer",
                                                     fontWeight: 400
                                                 }}
-                                                onClick={() => {
-                                                    this.setState({
-                                                        showSettingsCallout: false
-                                                    });
-                                                }}
+                                                onClick={this._handleCancel}
                                             >
                                                 Cancel
                                             </button>
@@ -262,13 +332,7 @@ export default class Container extends React.Component<
                                                     cursor: "pointer",
                                                     fontWeight: 600
                                                 }}
-                                                onClick={() => {
-                                                    // Save functionality will be added later
-                                                    alert("Settings saved!");
-                                                    this.setState({
-                                                        showSettingsCallout: false
-                                                    });
-                                                }}
+                                                onClick={this._handleSave}
                                             >
                                                 Save
                                             </button>

@@ -2,7 +2,7 @@
     "themes": {
         "backgroundColor": "#ffffff",
         "textColor": "#000000",
-        "is_sp_header": false,
+        "is_sp_header": true,
         "items_font_size": "18px"
     },
     "items": [
