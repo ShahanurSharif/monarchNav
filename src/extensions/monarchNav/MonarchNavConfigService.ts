@@ -20,36 +20,68 @@ export class MonarchNavConfigService {
   public static async ensureConfigFile(context: BaseApplicationCustomizer<unknown>["context"]): Promise<void> {
     const siteUrl = context.pageContext.web.absoluteUrl;
     console.log(`Checking for monarchNavConfig.json in Site Assets at: ${siteUrl}`);
+    
     try {
+      // First, check if the file already exists
       const serverRelativeUrl = `${context.pageContext.web.serverRelativeUrl.replace(/\/$/, '')}/SiteAssets/monarchNavConfig.json`;
+      console.log('Checking file at:', serverRelativeUrl);
+      console.log('Full GET URL:', `${siteUrl}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')`);
+      
       const checkResponse: SPHttpClientResponse = await context.spHttpClient.get(
         `${siteUrl}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')`,
         SPHttpClient.configurations.v1
       );
+      
+      console.log('GET Response Status:', checkResponse.status);
+      console.log('GET Response OK:', checkResponse.ok);
+      
       if (checkResponse.status === 200) {
+        console.log('File already exists, skipping creation');
         Log.info(LOG_SOURCE, 'monarchNavConfig.json already exists.');
         return;
       }
-    } catch (error) {
-      const status = (error as { status?: number })?.status;
-      console.log('Error checking monarchNavConfig.json:', status);
-      if (status === 404 || status === 400) {
-        Log.info(LOG_SOURCE, 'monarchNavConfig.json not found. Uploading default config as Site Asset...');
-        const folderServerRelativeUrl = `${context.pageContext.web.serverRelativeUrl.replace(/\/$/, '')}/SiteAssets`;
-        await context.spHttpClient.post(
-          `${siteUrl}/_api/web/GetFolderByServerRelativeUrl('${folderServerRelativeUrl}')/Files/add(overwrite=true,url=monarchNavConfig.json)`,
-          SPHttpClient.configurations.v1,
-          {
-            headers: {
-              'Accept': 'application/json;odata=nometadata'
-            },
-            body: new Blob([JSON.stringify(DEFAULT_CONFIG)], { type: 'application/json' })
-          }
-        );
+      
+    } catch (getError) {
+      console.log('GET Error (expected if file does not exist):', getError);
+      
+      // If file doesn't exist (404 or similar), proceed to create it
+      console.log('File does not exist, creating new one...');
+    }
+    
+    // Create the file since it doesn't exist
+    try {
+      console.log('About to create config file with DEFAULT_CONFIG:', JSON.stringify(DEFAULT_CONFIG, null, 2));
+      
+      const folderServerRelativeUrl = `${context.pageContext.web.serverRelativeUrl.replace(/\/$/, '')}/SiteAssets`;
+      console.log('Target folder URL:', folderServerRelativeUrl);
+      console.log('Full POST URL:', `${siteUrl}/_api/web/GetFolderByServerRelativeUrl('${folderServerRelativeUrl}')/Files/add(overwrite=true,url='monarchNavConfig.json')`);
+      
+      const postResponse = await context.spHttpClient.post(
+        `${siteUrl}/_api/web/GetFolderByServerRelativeUrl('${folderServerRelativeUrl}')/Files/add(overwrite=true,url='monarchNavConfig.json')`,
+        SPHttpClient.configurations.v1,
+        {
+          headers: {
+            'Accept': 'application/json;odata=nometadata'
+          },
+          body: new Blob([JSON.stringify(DEFAULT_CONFIG)], { type: 'application/json' })
+        }
+      );
+      
+      console.log('POST Response Status:', postResponse.status);
+      console.log('POST Response OK:', postResponse.ok);
+      
+      if (postResponse.ok) {
+        const responseData = await postResponse.json();
+        console.log('POST Response Data:', responseData);
         Log.info(LOG_SOURCE, 'monarchNavConfig.json uploaded to Site Assets root.');
       } else {
-        Log.error(LOG_SOURCE, error);
+        const errorText = await postResponse.text();
+        console.error('POST Error:', errorText);
+        Log.error(LOG_SOURCE, new Error(`Failed to upload config file: ${postResponse.status} - ${errorText}`));
       }
+    } catch (error) {
+      console.error('Error creating config file:', error);
+      Log.error(LOG_SOURCE, error as Error);
     }
   }
 }
