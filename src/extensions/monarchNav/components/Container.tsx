@@ -2,6 +2,8 @@ import * as React from "react";
 import { IContainerProps } from "./IContainerProps";
 import { IconButton, Callout, Toggle, ColorPicker } from "@fluentui/react";
 import { useConfigManager } from "../hooks/useConfigManager";
+import { useNavigationManager } from "../hooks/useNavigationManager";
+import { NavigationItemForm } from "./NavigationItemForm";
 
 const Container: React.FC<IContainerProps> = (props) => {
     // Use config manager hook for state management
@@ -14,14 +16,28 @@ const Container: React.FC<IContainerProps> = (props) => {
         updateTheme,
         saveConfig,
         reloadConfig,
-        resetConfig
+        resetConfig,
+        updateConfig
     } = useConfigManager(props.context, props.config);
+
+    // Navigation items management
+    const navigationManager = useNavigationManager(
+        config.items,
+        (newItems) => {
+            const newConfig = {
+                ...config,
+                items: newItems
+            };
+            updateConfig(newConfig);
+        }
+    );
 
     // UI state
     const [isSettingsCalloutVisible, setIsSettingsCalloutVisible] = React.useState(false);
     const [isEditActionsVisible, setIsEditActionsVisible] = React.useState(false);
 
     const settingsButtonRef = React.useRef<HTMLButtonElement>(null);
+    const navigationButtonRef = React.useRef<HTMLButtonElement>(null);
 
     // Helper function to apply SharePoint header visibility
     const applySpHeaderVisibility = React.useCallback((visible: boolean): void => {
@@ -281,6 +297,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                 </Callout>
                             )}
                             <button
+                                ref={navigationButtonRef}
                                 style={{
                                     background: "#fff",
                                     color: "#0078d4",
@@ -295,12 +312,36 @@ const Container: React.FC<IContainerProps> = (props) => {
                                 }}
                                 title="Add/Edit Navigation"
                                 aria-label="Add/Edit Navigation"
-                                onClick={() => {
-                                    alert("Add/Edit Navigation functionality coming soon!");
-                                }}
+                                onClick={navigationManager.openAddDialog}
                             >
                                 Add/Edit Navigation
                             </button>
+
+                            {/* Navigation Item Form Callout */}
+                            {navigationManager.isCalloutVisible && (
+                                <Callout
+                                    id="navigation_callout"
+                                    target={navigationButtonRef.current}
+                                    onDismiss={navigationManager.closeDialog}
+                                    setInitialFocus
+                                    styles={{
+                                        root: {
+                                            maxWidth: 400,
+                                            boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+                                        },
+                                    }}
+                                >
+                                    <NavigationItemForm
+                                        formData={navigationManager.formData}
+                                        validationErrors={navigationManager.validationErrors}
+                                        isSaving={navigationManager.isSaving}
+                                        isEditing={navigationManager.editingIndex !== undefined}
+                                        onFieldChange={navigationManager.updateFormField}
+                                        onSave={navigationManager.saveItem}
+                                        onCancel={navigationManager.cancelEdit}
+                                    />
+                                </Callout>
+                            )}
                         </>
                     )}
                     <div
@@ -308,8 +349,12 @@ const Container: React.FC<IContainerProps> = (props) => {
                         style={{
                             color: textColor,
                             fontSize: fontSize,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
                         }}
                     >
+                        {/* Home button */}
                         <button
                             style={{
                                 background: "none",
@@ -330,6 +375,57 @@ const Container: React.FC<IContainerProps> = (props) => {
                         >
                             Home
                         </button>
+                        
+                        {/* Dynamic navigation items */}
+                        {config.items.map((item, index) => (
+                            <button
+                                key={index}
+                                style={{
+                                    background: "none",
+                                    border: "none",
+                                    color: textColor,
+                                    fontSize: fontSize,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                    padding: "8px 16px",
+                                    borderRadius: 4,
+                                    transition: "background-color 0.2s ease",
+                                }}
+                                title={item.description || item.name}
+                                aria-label={item.name}
+                                onClick={(e) => {
+                                    if (isEditActionsVisible) {
+                                        // In edit mode, clicking opens edit dialog
+                                        e.preventDefault();
+                                        navigationManager.openEditDialog(index, item);
+                                    } else {
+                                        // Normal mode, navigate to link
+                                        if (item.target === '_blank') {
+                                            window.open(item.link, '_blank');
+                                        } else {
+                                            window.location.href = item.link;
+                                        }
+                                    }
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!isEditActionsVisible) {
+                                        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!isEditActionsVisible) {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }
+                                }}
+                            >
+                                {item.name}
+                                {isEditActionsVisible && (
+                                    <span style={{ fontSize: 12, marginLeft: 4, opacity: 0.7 }}>
+                                        ✏️
+                                    </span>
+                                )}
+                            </button>
+                        ))}
                     </div>
                     <IconButton
                         iconProps={{ iconName: "Edit" }}

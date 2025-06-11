@@ -7,7 +7,8 @@ const LOG_SOURCE: string = 'MonarchNavConfigService';
 export interface IMonarchNavItem {
   name: string;
   link: string;
-  target?: string;
+  target?: '_self' | '_blank';
+  description?: string;
   children?: IMonarchNavItem[];
 }
 
