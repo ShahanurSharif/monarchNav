@@ -32,11 +32,10 @@ export default class MonarchNavApplicationCustomizer
     try {
       Log.info(LOG_SOURCE, "Initializing MonarchNav extension...");
       
-      // Ensure config file exists
-      await MonarchNavConfigService.ensureConfigFile(this.context);
-      
-      // Load configuration from SharePoint
+      // Load configuration from deployed file in SharePoint Site Assets
       const config: IMonarchNavConfig = await MonarchNavConfigService.loadConfig(this.context);
+      
+      Log.info(LOG_SOURCE, `Configuration loaded: ${JSON.stringify(config.themes)}`);
       
       // Create React element with loaded configuration
       const element: React.ReactElement = React.createElement(
@@ -55,6 +54,7 @@ export default class MonarchNavApplicationCustomizer
       if (topPlaceholder) {
         this._topPlaceholder = topPlaceholder;
         ReactDom.render(element, topPlaceholder.domElement);
+        Log.info(LOG_SOURCE, "MonarchNav extension rendered successfully");
       }
 
     } catch (error) {

@@ -1,0 +1,30 @@
+{
+    "themes": {
+        "backgroundColor": "#0078d4",
+        "textColor": "#ffffff",
+        "is_sp_header": true,
+        "items_font_size": "18px"
+    },
+    "items": [
+        {
+            "name": "Home",
+            "link": "",
+            "target": "_self"
+        },
+        {
+            "name": "Another", 
+            "link": "",
+            "target": "_self",
+            "children": [
+                {
+                    "name": "Sub Item 1",
+                    "link": ""
+                },
+                {
+                    "name": "Sub Item 2",
+                    "link": ""
+                }
+            ]
+        }
+    ]
+}
