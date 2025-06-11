@@ -112,6 +112,20 @@ const Container: React.FC<IContainerProps> = (props) => {
     const fontSize = parseInt(config.themes.items_font_size.replace('px', ''));
     const homeUrl = props.context.pageContext.web.absoluteUrl;
 
+    // Process navigation items to replace empty links with home URL
+    const processedItems = React.useMemo(() => {
+        return config.items.map(item => {
+            // If link is empty, use SharePoint home URL
+            if (!item.link || item.link === "") {
+                return {
+                    ...item,
+                    link: homeUrl
+                };
+            }
+            return item;
+        });
+    }, [config.items, homeUrl]);
+
     return (
         <div>
             <div
@@ -354,30 +368,8 @@ const Container: React.FC<IContainerProps> = (props) => {
                             gap: 8,
                         }}
                     >
-                        {/* Home button */}
-                        <button
-                            style={{
-                                background: "none",
-                                border: "none",
-                                color: textColor,
-                                fontSize: fontSize,
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                padding: "8px 16px",
-                                borderRadius: 4,
-                                transition: "background-color 0.2s ease",
-                            }}
-                            title="Home"
-                            aria-label="Home"
-                            onClick={() => {
-                                window.location.href = homeUrl;
-                            }}
-                        >
-                            Home
-                        </button>
-                        
-                        {/* Dynamic navigation items */}
-                        {config.items.map((item, index) => (
+                        {/* Dynamic navigation items from config */}
+                        {processedItems.map((item, index) => (
                             <button
                                 key={index}
                                 style={{
@@ -397,7 +389,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     if (isEditActionsVisible) {
                                         // In edit mode, clicking opens edit dialog
                                         e.preventDefault();
-                                        navigationManager.openEditDialog(index, item);
+                                        navigationManager.openEditDialog(index, config.items[index]);
                                     } else {
                                         // Normal mode, navigate to link
                                         if (item.target === '_blank') {

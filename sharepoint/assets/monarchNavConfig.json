@@ -9,22 +9,20 @@
         {
             "name": "Home",
             "link": "",
-            "target": "_self"
+            "target": "_self",
+            "description": "Navigate to site home page"
         },
         {
-            "name": "Another", 
-            "link": "",
+            "name": "Documents",
+            "link": "/Shared Documents",
             "target": "_self",
-            "children": [
-                {
-                    "name": "Sub Item 1",
-                    "link": ""
-                },
-                {
-                    "name": "Sub Item 2",
-                    "link": ""
-                }
-            ]
+            "description": "Site documents library"
+        },
+        {
+            "name": "Lists", 
+            "link": "/Lists",
+            "target": "_self",
+            "description": "Site lists"
         }
     ]
 }
