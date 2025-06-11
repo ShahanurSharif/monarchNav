@@ -1,7 +1,7 @@
 {
     "themes": {
-        "backgroundColor": "#ffffff",
-        "textColor": "#000000",
+        "backgroundColor": "#0078d4",
+        "textColor": "#ffffff",
         "is_sp_header": true,
         "items_font_size": "18px"
     },
