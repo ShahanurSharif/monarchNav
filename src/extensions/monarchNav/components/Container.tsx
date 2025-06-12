@@ -64,18 +64,14 @@ const Container: React.FC<IContainerProps> = (props) => {
                 ...config,
                 items: newItems
             };
-            
             // Auto-save navigation changes immediately
             try {
                 setIsAutoSaving(true); // Prevent unsaved changes dialog
+                markAsSaved(); // Mark as saved BEFORE updateConfig to avoid race condition
                 updateConfig(newConfig);
                 // Save the new config directly to avoid state timing issues
                 await MonarchNavConfigService.saveConfig(props.context, newConfig);
                 console.log('Navigation changes auto-saved successfully');
-                
-                // Phase 4: Mark configuration as saved to prevent unsaved changes dialog
-                // This makes parent item operations consistent with child items and theme changes
-                markAsSaved();
             } catch (error) {
                 console.error('Failed to auto-save navigation changes:', error);
                 // Could show a toast notification here instead of alert

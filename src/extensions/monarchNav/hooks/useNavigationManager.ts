@@ -383,6 +383,11 @@ export const useNavigationManager = (
     const { editingContext } = state;
     if (!editingContext) return false;
 
+    // Suppress unsaved changes dialog for parent edit callout
+    if (editingContext.type === 'edit-parent') {
+      return false;
+    }
+
     // For new items, consider changes if any field has content
     const isAddingNewItem = editingContext.type === 'add-parent' || editingContext.type === 'add-child';
     if (isAddingNewItem) {
@@ -393,7 +398,6 @@ export const useNavigationManager = (
         state.formData.description.trim() !== ''
       );
     }
-    
     // For editing existing items, compare with initial snapshot
     return (
       state.formData.name !== initialFormSnapshot.name ||
