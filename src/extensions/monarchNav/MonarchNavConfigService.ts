@@ -18,6 +18,9 @@ export interface IMonarchNavConfig {
     textColor: string;
     is_sp_header: boolean;
     items_font_size: string;
+    logoUrl: string;
+    logoSize: string;
+    fontStyle: string;
   };
   items: IMonarchNavItem[];
 }
@@ -28,7 +31,10 @@ const FALLBACK_CONFIG: IMonarchNavConfig = {
     backgroundColor: "#0078d4",
     textColor: "#ffffff",
     is_sp_header: true,
-    items_font_size: "18px"
+    items_font_size: "18px",
+    logoUrl: "/SiteAssets/MonarchNav.png",
+    logoSize: "40px",
+    fontStyle: "normal"
   },
   items: [
     {

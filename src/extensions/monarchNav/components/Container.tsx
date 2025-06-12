@@ -187,6 +187,7 @@ const Container: React.FC<IContainerProps> = (props) => {
     const backgroundColor = config.themes.backgroundColor;
     const textColor = config.themes.textColor;
     const fontSize = parseInt(config.themes.items_font_size.replace('px', ''));
+    const fontStyle = config.themes.fontStyle || "normal";
     const homeUrl = props.context.pageContext.web.absoluteUrl;
 
     // Process navigation items to replace empty links with home URL
@@ -229,6 +230,17 @@ const Container: React.FC<IContainerProps> = (props) => {
                         gap: 8,
                     }}
                 >
+                    {/* Logo rendering using config.themes.logoUrl and logoSize */}
+                    <img
+                        src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
+                        alt="Logo"
+                        style={{
+                            height: config.themes.logoSize || "40px",
+                            width: "auto",
+                            marginRight: 16,
+                            background: "transparent"
+                        }}
+                    />
                     {isEditActionsVisible && (
                         <>
                             <button
@@ -323,6 +335,67 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
                                             {fontSize}px
                                         </div>
+                                    </div>
+                                    
+                                    {/* Logo Upload */}
+                                    <div style={{ marginTop: 16 }}>
+                                        <div style={{ marginBottom: 4 }}>Header Logo</div>
+                                        <img
+                                            src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
+                                            alt="Logo"
+                                            style={{
+                                                height: config.themes.logoSize || "40px",
+                                                width: "auto",
+                                                marginBottom: 8,
+                                                borderRadius: 4,
+                                                background: "#fff",
+                                                border: "1px solid #eee"
+                                            }}
+                                        />
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            style={{ marginBottom: 8 }}
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onload = (ev) => {
+                                                        updateTheme("logoUrl", ev.target?.result as string);
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                        />
+                                        {/* Logo Resize Slider */}
+                                        <div style={{ marginTop: 8 }}>
+                                            <div style={{ marginBottom: 4 }}>Logo Size</div>
+                                            <input
+                                                type="range"
+                                                min={24}
+                                                max={128}
+                                                value={config.themes.logoSize ? parseInt(config.themes.logoSize) : 40}
+                                                onChange={e => updateTheme("logoSize", `${e.target.value}px`)}
+                                                style={{ width: "100%" }}
+                                            />
+                                            <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
+                                                {config.themes.logoSize || "40px"}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Font Style Dropdown */}
+                                    <div style={{ marginTop: 16 }}>
+                                        <div style={{ marginBottom: 4 }}>Menu Font Style</div>
+                                        <select
+                                            value={config.themes.fontStyle || "normal"}
+                                            onChange={e => updateTheme("fontStyle", e.target.value)}
+                                            style={{ width: "100%", padding: "6px", borderRadius: 2 }}
+                                        >
+                                            <option value="normal">Normal</option>
+                                            <option value="bold">Bold</option>
+                                            <option value="italic">Italic</option>
+                                        </select>
                                     </div>
                                     
                                     {/* Action buttons */}
@@ -475,6 +548,8 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         border: "none",
                                         color: textColor,
                                         fontSize: fontSize,
+                                        fontWeight: fontStyle === "bold" ? "bold" : "normal",
+                                        fontStyle: fontStyle === "italic" ? "italic" : "normal",
                                         cursor: "pointer",
                                         padding: "8px 16px",
                                         borderRadius: 4,
