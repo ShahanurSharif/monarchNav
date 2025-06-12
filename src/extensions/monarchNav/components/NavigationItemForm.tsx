@@ -19,11 +19,17 @@ export interface INavigationItemFormProps {
   onFieldChange: (field: keyof INavigationItemForm, value: string) => void;
   onSave: () => Promise<void>;
   onCancel: () => void;
+  
+  // Enhanced hierarchical support
+  getFormTitle: () => string;
+  isChildForm: () => boolean;
+  canAddChild: () => boolean;
+  onAddChild?: () => void;
 }
 
 /**
- * Form component for adding/editing navigation items
- * Provides validation and user-friendly interface
+ * Enhanced form component for adding/editing hierarchical navigation items
+ * Supports parent/child context with flexible validation and child addition
  */
 export const NavigationItemForm: React.FC<INavigationItemFormProps> = ({
   formData,
@@ -35,7 +41,11 @@ export const NavigationItemForm: React.FC<INavigationItemFormProps> = ({
   hasUnsavedChanges = false,
   onFieldChange,
   onSave,
-  onCancel
+  onCancel,
+  getFormTitle,
+  isChildForm,
+  canAddChild,
+  onAddChild
 }) => {
   
   // Target options for dropdown
@@ -44,8 +54,9 @@ export const NavigationItemForm: React.FC<INavigationItemFormProps> = ({
     { key: '_blank', text: 'New tab' }
   ];
 
-  // Simple validation - just check required fields
-  const isFormValid = formData.name.trim() && formData.link.trim();
+  // Enhanced validation - flexible for child items
+  const isChildContext = isChildForm();
+  const isFormValid = formData.name.trim() && (isChildContext || formData.link.trim());
 
   // Handle save - simplified like todo item save
   const handleSave = async (): Promise<void> => {
@@ -74,10 +85,31 @@ export const NavigationItemForm: React.FC<INavigationItemFormProps> = ({
   return (
     <div style={{ padding: 16, minWidth: 300 }}>
       <Stack tokens={{ childrenGap: 16 }}>
-        {/* Form Title */}
-        <Text variant="large" style={{ fontWeight: 600, marginBottom: 8 }}>
-          {isEditing ? 'Edit Navigation Item' : 'Add Navigation Item'}
-        </Text>
+        {/* Enhanced Form Title with Context */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <Text variant="large" style={{ fontWeight: 600 }}>
+            {getFormTitle()}
+          </Text>
+          {/* Add Child Button for Parent Items */}
+          {canAddChild() && onAddChild && (
+            <button
+              style={{
+                backgroundColor: "#f3f2f1",
+                color: "#323130",
+                border: "1px solid #d2d0ce",
+                borderRadius: 2,
+                padding: "4px 12px",
+                fontSize: 12,
+                cursor: "pointer",
+                fontWeight: 400
+              }}
+              onClick={onAddChild}
+              title="Add a child item to this navigation"
+            >
+              📁 Add Child
+            </button>
+          )}
+        </div>
 
         {/* Loading/Error states */}
         {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
@@ -110,14 +142,14 @@ export const NavigationItemForm: React.FC<INavigationItemFormProps> = ({
           description="Display name for the navigation item"
         />
 
-        {/* Link Field */}
+        {/* Link Field - Optional for child items */}
         <TextField
           label="Link"
-          placeholder="https://example.com or /sites/mysite"
+          placeholder={isChildContext ? "Optional: https://example.com or /sites/mysite" : "https://example.com or /sites/mysite"}
           value={formData.link}
           onChange={(_, newValue) => onFieldChange('link', newValue || '')}
-          required
-          description="URL or relative path to navigate to"
+          required={!isChildContext}
+          description={isChildContext ? "Optional URL or relative path (child items can be informational)" : "URL or relative path to navigate to"}
         />
 
         {/* Target Dropdown */}

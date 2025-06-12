@@ -12,35 +12,61 @@ export interface INavigationItemForm {
 }
 
 /**
- * Navigation manager state interface
+ * Hierarchical editing context interface
+ */
+export interface INavigationEditingContext {
+  type: 'add-parent' | 'edit-parent' | 'add-child' | 'edit-child';
+  parentIndex: number;
+  childIndex?: number;
+  itemPath: string; // Human-readable path like "Home > Documents"
+}
+
+/**
+ * Enhanced navigation manager state interface
  */
 export interface INavigationManagerState {
   isCalloutVisible: boolean;
-  editingIndex: number | undefined; // undefined for new item, index for editing
+  editingContext?: INavigationEditingContext;
   formData: INavigationItemForm;
   validationErrors: string[];
   isSaving: boolean;
   isLoading: boolean;
   error: string | undefined;
   hasUnsavedChanges: boolean;
+  
+  // Backward compatibility
+  editingIndex: number | undefined;
 }
 
 /**
- * Navigation manager actions interface
+ * Enhanced navigation manager actions interface
  */
 export interface INavigationManagerActions {
+  // Parent operations
   openAddDialog: () => void;
   openEditDialog: (index: number, item: IMonarchNavItem) => void;
+  openEditParentDialog: (parentIndex: number) => void;
+  
+  // Child operations
+  openAddChildDialog: (parentIndex: number) => void;
+  openEditChildDialog: (parentIndex: number, childIndex: number) => void;
+  
+  // Common operations
   closeDialog: () => void;
   updateFormField: (field: keyof INavigationItemForm, value: string) => void;
   validateForm: () => boolean;
   saveItem: () => Promise<void>;
   cancelEdit: () => void;
+  
+  // Utility functions
+  getFormTitle: () => string;
+  isChildForm: () => boolean;
+  canAddChild: () => boolean;
 }
 
 /**
- * Hook for managing navigation items (add/edit/delete)
- * Handles form state, validation, and CRUD operations
+ * Enhanced Hook for managing hierarchical navigation items
+ * Handles form state, validation, and CRUD operations for parent/child items
  */
 export const useNavigationManager = (
   items: IMonarchNavItem[],
@@ -55,10 +81,11 @@ export const useNavigationManager = (
     description: ''
   };
 
-  // State management
+  // Enhanced state management
   const [state, setState] = React.useState<INavigationManagerState>({
     isCalloutVisible: false,
-    editingIndex: undefined,
+    editingContext: undefined,
+    editingIndex: undefined, // Backward compatibility
     formData: initialFormData,
     validationErrors: [],
     isSaving: false,
@@ -70,18 +97,33 @@ export const useNavigationManager = (
   // Track initial form data to detect changes
   const [initialFormSnapshot, setInitialFormSnapshot] = React.useState<INavigationItemForm>(initialFormData);
 
+  // Utility functions
+  const getItemPath = React.useCallback((parentIndex: number, childIndex?: number): string => {
+    const parent = items[parentIndex];
+    if (!parent) return 'Unknown Item';
+    
+    if (childIndex !== undefined) {
+      const child = parent.children?.[childIndex];
+      return `${parent.name} > ${child?.name || 'New Child Item'}`;
+    }
+    
+    return parent.name;
+  }, [items]);
+
   // Validation function
   const validateForm = React.useCallback((): boolean => {
     const errors: string[] = [];
     
     if (!state.formData.name.trim()) {
-      errors.push('Title is required');
+      errors.push('Name is required');
     }
     
-    if (!state.formData.link.trim()) {
-      errors.push('Link is required');
-    } else {
-      // Basic URL validation - check for common URL patterns or relative paths
+    // Link validation - more flexible for child items
+    const isChildContext = state.editingContext?.type === 'add-child' || state.editingContext?.type === 'edit-child';
+    if (!isChildContext && !state.formData.link.trim()) {
+      errors.push('Link is required for parent items');
+    } else if (state.formData.link.trim()) {
+      // Basic URL validation when link is provided
       const link = state.formData.link.trim();
       const isAbsoluteUrl = link.indexOf('http://') === 0 || link.indexOf('https://') === 0 || link.indexOf('mailto:') === 0;
       const isRelativePath = link.indexOf('/') === 0 || link.indexOf('#') === 0 || link.indexOf('./') === 0;
@@ -93,22 +135,26 @@ export const useNavigationManager = (
 
     setState(prev => ({ ...prev, validationErrors: errors }));
     return errors.length === 0;
-  }, [state.formData]);
+  }, [state.formData, state.editingContext]);
 
-  // Open dialog for adding new item
+  // Dialog operations
   const openAddDialog = React.useCallback((): void => {
     setState(prev => ({
       ...prev,
       isCalloutVisible: true,
+      editingContext: {
+        type: 'add-parent',
+        parentIndex: -1, // Will be set when adding
+        itemPath: 'New Navigation Item'
+      },
       editingIndex: undefined,
       formData: initialFormData,
       validationErrors: [],
       hasUnsavedChanges: false
     }));
     setInitialFormSnapshot(initialFormData);
-  }, []);
+  }, [initialFormData]);
 
-  // Open dialog for editing existing item
   const openEditDialog = React.useCallback((index: number, item: IMonarchNavItem): void => {
     const formData = {
       name: item.name,
@@ -120,27 +166,105 @@ export const useNavigationManager = (
     setState(prev => ({
       ...prev,
       isCalloutVisible: true,
-      editingIndex: index,
+      editingContext: {
+        type: 'edit-parent',
+        parentIndex: index,
+        itemPath: getItemPath(index)
+      },
+      editingIndex: index, // Backward compatibility
       formData,
       validationErrors: [],
       hasUnsavedChanges: false
     }));
     setInitialFormSnapshot(formData);
-  }, []);
+  }, [getItemPath]);
 
-  // Close dialog
+  const openEditParentDialog = React.useCallback((parentIndex: number): void => {
+    const item = items[parentIndex];
+    if (!item) return;
+
+    const formData = {
+      name: item.name,
+      link: item.link,
+      target: item.target || '_self',
+      description: item.description || ''
+    };
+    
+    setState(prev => ({
+      ...prev,
+      isCalloutVisible: true,
+      editingContext: {
+        type: 'edit-parent',
+        parentIndex,
+        itemPath: getItemPath(parentIndex)
+      },
+      editingIndex: parentIndex,
+      formData,
+      validationErrors: [],
+      hasUnsavedChanges: false
+    }));
+    setInitialFormSnapshot(formData);
+  }, [items, getItemPath]);
+
+  const openAddChildDialog = React.useCallback((parentIndex: number): void => {
+    setState(prev => ({
+      ...prev,
+      isCalloutVisible: true,
+      editingContext: {
+        type: 'add-child',
+        parentIndex,
+        itemPath: `${items[parentIndex]?.name} > New Child Item`
+      },
+      editingIndex: undefined,
+      formData: initialFormData,
+      validationErrors: [],
+      hasUnsavedChanges: false
+    }));
+    setInitialFormSnapshot(initialFormData);
+  }, [items, initialFormData]);
+
+  const openEditChildDialog = React.useCallback((parentIndex: number, childIndex: number): void => {
+    const parentItem = items[parentIndex];
+    const childItem = parentItem?.children?.[childIndex];
+    if (!childItem) return;
+
+    const formData = {
+      name: childItem.name,
+      link: childItem.link || '',
+      target: childItem.target || '_self',
+      description: childItem.description || ''
+    };
+    
+    setState(prev => ({
+      ...prev,
+      isCalloutVisible: true,
+      editingContext: {
+        type: 'edit-child',
+        parentIndex,
+        childIndex,
+        itemPath: getItemPath(parentIndex, childIndex)
+      },
+      editingIndex: undefined, // Child editing doesn't use flat index
+      formData,
+      validationErrors: [],
+      hasUnsavedChanges: false
+    }));
+    setInitialFormSnapshot(formData);
+  }, [items, getItemPath]);
+
   const closeDialog = React.useCallback((): void => {
     setState(prev => ({
       ...prev,
       isCalloutVisible: false,
+      editingContext: undefined,
       editingIndex: undefined,
       formData: initialFormData,
       validationErrors: [],
       isSaving: false
     }));
-  }, []);
+  }, [initialFormData]);
 
-  // Update form field
+  // Form field updates
   const updateFormField = React.useCallback((
     field: keyof INavigationItemForm, 
     value: string
@@ -155,88 +279,113 @@ export const useNavigationManager = (
     }));
   }, []);
 
-  // Save item (add or update) - simplified like todo item
+  // Enhanced save operation
   const saveItem = React.useCallback(async (): Promise<void> => {
-    setState(prev => {
-      // Get current state values
-      const currentFormData = prev.formData;
-      const currentEditingIndex = prev.editingIndex;
-      
-      // Validate form
-      const errors: string[] = [];
-      if (!currentFormData.name.trim()) {
-        errors.push('Title is required');
-      }
-      if (!currentFormData.link.trim()) {
-        errors.push('Link is required');
-      }
-      
-      if (errors.length > 0) {
-        return { ...prev, validationErrors: errors };
-      }
+    if (!validateForm()) {
+      return;
+    }
 
-      // Set saving state
-      const newState = { ...prev, isSaving: true, validationErrors: [] };
+    const { editingContext } = state;
+    if (!editingContext) return;
 
-      // Perform the save operation
-      setTimeout(() => {
-        try {
-          const newItem: IMonarchNavItem = {
-            name: currentFormData.name.trim(),
-            link: currentFormData.link.trim(),
-            target: currentFormData.target,
-            description: currentFormData.description.trim() || undefined
+    setState(prev => ({ ...prev, isSaving: true }));
+
+    try {
+      const newItem: IMonarchNavItem = {
+        name: state.formData.name.trim(),
+        link: state.formData.link.trim(),
+        target: state.formData.target,
+        description: state.formData.description.trim() || undefined
+      };
+
+      // Clone items for immutable update
+      const newItems = [...items];
+
+      switch (editingContext.type) {
+        case 'add-parent':
+          // Add new parent item
+          newItems.push(newItem);
+          console.log('Added new parent item:', newItem);
+          break;
+
+        case 'edit-parent':
+          // Update parent, preserve children
+          newItems[editingContext.parentIndex] = {
+            ...newItem,
+            children: newItems[editingContext.parentIndex]?.children
           };
+          console.log(`Updated parent item at index ${editingContext.parentIndex}:`, newItem);
+          break;
 
-          let newItems: IMonarchNavItem[];
-
-          if (currentEditingIndex !== undefined) {
-            // Update existing item at specific index
-            newItems = [...items];
-            newItems[currentEditingIndex] = newItem;
-            console.log(`Updated item at index ${currentEditingIndex}:`, newItem);
-          } else {
-            // Add new item
-            newItems = [...items, newItem];
-            console.log('Added new item:', newItem);
+        case 'add-child':
+          // Add child to parent
+          if (!newItems[editingContext.parentIndex].children) {
+            newItems[editingContext.parentIndex].children = [];
           }
+          newItems[editingContext.parentIndex].children!.push(newItem);
+          console.log(`Added child to parent ${editingContext.parentIndex}:`, newItem);
+          break;
 
-          // Update items array
-          onItemsChange(newItems);
-          
-          // Close dialog
-          setState(finalState => ({
-            ...finalState,
-            isCalloutVisible: false,
-            editingIndex: undefined,
-            formData: initialFormData,
-            validationErrors: [],
-            isSaving: false
-          }));
+        case 'edit-child':
+          // Update specific child
+          if (editingContext.childIndex !== undefined && newItems[editingContext.parentIndex]?.children) {
+            newItems[editingContext.parentIndex].children![editingContext.childIndex] = newItem;
+            console.log(`Updated child ${editingContext.parentIndex}-${editingContext.childIndex}:`, newItem);
+          }
+          break;
+      }
 
-        } catch (error) {
-          console.error('Error saving navigation item:', error);
-          setState(errorState => ({ 
-            ...errorState, 
-            validationErrors: ['Failed to save navigation item'],
-            isSaving: false 
-          }));
-        }
-      }, 0);
+      // Update items and close dialog
+      console.log('Navigation Manager - Final items before onItemsChange:', JSON.stringify(newItems, null, 2));
+      onItemsChange(newItems);
+      closeDialog();
 
-      return newState;
-    });
-  }, [items, onItemsChange]);
+    } catch (error) {
+      console.error('Error saving navigation item:', error);
+      setState(prev => ({ 
+        ...prev, 
+        error: 'Failed to save navigation item',
+        validationErrors: ['Failed to save navigation item'],
+        isSaving: false 
+      }));
+    }
+  }, [state.formData, state.editingContext, items, onItemsChange, validateForm, closeDialog]);
 
-  // Cancel edit
   const cancelEdit = React.useCallback((): void => {
     closeDialog();
   }, [closeDialog]);
 
+  // Utility functions
+  const getFormTitle = React.useCallback((): string => {
+    const { editingContext } = state;
+    if (!editingContext) return 'Navigation Item';
+    
+    switch (editingContext.type) {
+      case 'add-parent': return 'Add Navigation Item';
+      case 'edit-parent': return 'Edit Navigation Item';
+      case 'add-child': return 'Add Child Item';
+      case 'edit-child': return 'Edit Child Item';
+      default: return 'Navigation Item';
+    }
+  }, [state.editingContext]);
+
+  const isChildForm = React.useCallback((): boolean => {
+    const contextType = state.editingContext?.type;
+    return contextType === 'add-child' || contextType === 'edit-child';
+  }, [state.editingContext]);
+
+  const canAddChild = React.useCallback((): boolean => {
+    return state.editingContext?.type === 'edit-parent';
+  }, [state.editingContext]);
+
   // Detect unsaved changes
   const hasUnsavedChanges = React.useMemo(() => {
-    // For new items (not editing), consider changes if any field has content
-    if (state.editingIndex === undefined) {
+    const { editingContext } = state;
+    if (!editingContext) return false;
+
+    // For new items, consider changes if any field has content
+    const isAddingNewItem = editingContext.type === 'add-parent' || editingContext.type === 'add-child';
+    if (isAddingNewItem) {
       return (
         state.formData.name.trim() !== '' ||
         state.formData.link.trim() !== '' ||
@@ -252,7 +401,7 @@ export const useNavigationManager = (
       state.formData.target !== initialFormSnapshot.target ||
       state.formData.description !== initialFormSnapshot.description
     );
-  }, [state.formData, initialFormSnapshot, state.editingIndex]);
+  }, [state.formData, initialFormSnapshot, state.editingContext]);
 
   // Update hasUnsavedChanges in state
   React.useEffect(() => {
@@ -266,10 +415,18 @@ export const useNavigationManager = (
     // Actions
     openAddDialog,
     openEditDialog,
+    openEditParentDialog,
+    openAddChildDialog,
+    openEditChildDialog,
     closeDialog,
     updateFormField,
     validateForm,
     saveItem,
-    cancelEdit
+    cancelEdit,
+    
+    // Utility functions
+    getFormTitle,
+    isChildForm,
+    canAddChild
   };
 };

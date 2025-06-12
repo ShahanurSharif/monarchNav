@@ -62,6 +62,7 @@ export const useConfigManager = (
 
     // Actions
     const updateConfig = React.useCallback((newConfig: IMonarchNavConfig) => {
+        console.log('Config Manager - Updating config with items:', JSON.stringify(newConfig.items, null, 2));
         setConfig(newConfig);
         setError(undefined);
     }, []);
@@ -92,6 +93,7 @@ export const useConfigManager = (
                 return;
             }
             
+            console.log('Config Manager - About to save config with items:', JSON.stringify(config.items, null, 2));
             await MonarchNavConfigService.saveConfig(context, config);
             
             // Update original config to reflect saved state

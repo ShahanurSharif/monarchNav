@@ -16,7 +16,21 @@
             "name": "Documents",
             "link": "/Shared Documents",
             "target": "_self",
-            "description": "Site documents library"
+            "description": "Site documents library",
+            "children": [
+                {
+                    "name": "Policies",
+                    "link": "/Shared Documents/Policies",
+                    "target": "_self",
+                    "description": "Company policies and procedures"
+                },
+                {
+                    "name": "Templates", 
+                    "link": "/Shared Documents/Templates",
+                    "target": "_self",
+                    "description": "Document templates"
+                }
+            ]
         },
         {
             "name": "Lists", 

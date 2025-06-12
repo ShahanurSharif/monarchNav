@@ -4,6 +4,7 @@ import { IconButton, Callout, Toggle, ColorPicker, Dialog, DialogType, DialogFoo
 import { useConfigManager } from "../hooks/useConfigManager";
 import { useNavigationManager } from "../hooks/useNavigationManager";
 import { NavigationItemForm } from "./NavigationItemForm";
+import { MonarchNavConfigService } from "../MonarchNavConfigService";
 
 const Container: React.FC<IContainerProps> = (props) => {
     // Inject CSS for dialog styling
@@ -51,15 +52,26 @@ const Container: React.FC<IContainerProps> = (props) => {
         updateConfig
     } = useConfigManager(props.context, props.config);
 
-    // Navigation items management
+    // Navigation items management with auto-save
     const navigationManager = useNavigationManager(
         config.items,
-        (newItems) => {
+        async (newItems) => {
             const newConfig = {
                 ...config,
                 items: newItems
             };
-            updateConfig(newConfig);
+            
+            // Auto-save navigation changes immediately
+            try {
+                updateConfig(newConfig);
+                // Save the new config directly to avoid state timing issues
+                await MonarchNavConfigService.saveConfig(props.context, newConfig);
+                console.log('Navigation changes auto-saved successfully');
+            } catch (error) {
+                console.error('Failed to auto-save navigation changes:', error);
+                // Could show a toast notification here instead of alert
+                alert('Failed to save navigation changes. Please try again.');
+            }
         }
     );
 
@@ -70,6 +82,36 @@ const Container: React.FC<IContainerProps> = (props) => {
 
     const settingsButtonRef = React.useRef<HTMLButtonElement>(null);
     const navigationButtonRef = React.useRef<HTMLButtonElement>(null);
+
+    // State for dropdown menus
+    const [dropdownStates, setDropdownStates] = React.useState<{[key: number]: boolean}>({});
+    const [dropdownTimeouts, setDropdownTimeouts] = React.useState<{[key: number]: number}>({});
+
+    // Handle dropdown visibility
+    const showDropdown = React.useCallback((parentIndex: number): void => {
+        // Clear any existing timeout for this dropdown
+        if (dropdownTimeouts[parentIndex]) {
+            clearTimeout(dropdownTimeouts[parentIndex]);
+        }
+        
+        setDropdownStates(prev => ({ ...prev, [parentIndex]: true }));
+    }, [dropdownTimeouts]);
+
+    const hideDropdown = React.useCallback((parentIndex: number): void => {
+        // Set a timeout to hide the dropdown (allows moving mouse to dropdown)
+        const timeout = window.setTimeout(() => {
+            setDropdownStates(prev => ({ ...prev, [parentIndex]: false }));
+        }, 150);
+        
+        setDropdownTimeouts(prev => ({ ...prev, [parentIndex]: timeout }));
+    }, []);
+
+    const cancelHideDropdown = React.useCallback((parentIndex: number): void => {
+        // Cancel the hide timeout when mouse re-enters
+        if (dropdownTimeouts[parentIndex]) {
+            clearTimeout(dropdownTimeouts[parentIndex]);
+        }
+    }, [dropdownTimeouts]);
 
     // Helper function to apply SharePoint header visibility
     const applySpHeaderVisibility = React.useCallback((visible: boolean): void => {
@@ -401,6 +443,14 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         onFieldChange={navigationManager.updateFormField}
                                         onSave={navigationManager.saveItem}
                                         onCancel={navigationManager.cancelEdit}
+                                        getFormTitle={navigationManager.getFormTitle}
+                                        isChildForm={navigationManager.isChildForm}
+                                        canAddChild={navigationManager.canAddChild}
+                                        onAddChild={() => {
+                                            if (navigationManager.editingContext?.type === 'edit-parent') {
+                                                navigationManager.openAddChildDialog(navigationManager.editingContext.parentIndex);
+                                            }
+                                        }}
                                     />
                                 </Callout>
                             )}
@@ -416,55 +466,163 @@ const Container: React.FC<IContainerProps> = (props) => {
                             gap: 8,
                         }}
                     >
-                        {/* Dynamic navigation items from config */}
-                        {processedItems.map((item, index) => (
-                            <button
-                                key={index}
-                                style={{
-                                    background: "none",
-                                    border: "none",
-                                    color: textColor,
-                                    fontSize: fontSize,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                    padding: "8px 16px",
-                                    borderRadius: 4,
-                                    transition: "background-color 0.2s ease",
-                                }}
-                                title={item.description || item.name}
-                                aria-label={item.name}
-                                onClick={(e) => {
-                                    if (isEditActionsVisible) {
-                                        // In edit mode, clicking opens edit dialog
-                                        e.preventDefault();
-                                        navigationManager.openEditDialog(index, config.items[index]);
-                                    } else {
-                                        // Normal mode, navigate to link
-                                        if (item.target === '_blank') {
-                                            window.open(item.link, '_blank');
-                                        } else {
-                                            window.location.href = item.link;
-                                        }
+                        {/* Enhanced hierarchical navigation with dropdown menus */}
+                        {processedItems.map((item, parentIndex) => (
+                            <div 
+                                key={`nav-item-${parentIndex}`}
+                                style={{ position: 'relative', display: 'inline-block' }}
+                                onMouseEnter={() => {
+                                    if (item.children && item.children.length > 0) {
+                                        cancelHideDropdown(parentIndex);
+                                        showDropdown(parentIndex);
                                     }
                                 }}
-                                onMouseEnter={(e) => {
-                                    if (!isEditActionsVisible) {
-                                        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (!isEditActionsVisible) {
-                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                onMouseLeave={() => {
+                                    if (item.children && item.children.length > 0) {
+                                        hideDropdown(parentIndex);
                                     }
                                 }}
                             >
-                                {item.name}
-                                {isEditActionsVisible && (
-                                    <span style={{ fontSize: 12, marginLeft: 4, opacity: 0.7 }}>
-                                        ✏️
-                                    </span>
+                                {/* Parent Item */}
+                                <button
+                                    style={{
+                                        background: "none",
+                                        border: "none",
+                                        color: textColor,
+                                        fontSize: fontSize,
+                                        fontWeight: 600,
+                                        cursor: "pointer",
+                                        padding: "8px 16px",
+                                        borderRadius: 4,
+                                        transition: "background-color 0.2s ease",
+                                        display: "flex",
+                                        alignItems: "center",
+                                    }}
+                                    title={item.description || item.name}
+                                    aria-label={item.name}
+                                    onClick={(e) => {
+                                        if (isEditActionsVisible) {
+                                            // In edit mode, clicking opens edit dialog
+                                            e.preventDefault();
+                                            navigationManager.openEditDialog(parentIndex, config.items[parentIndex]);
+                                        } else {
+                                            // Normal mode - if has children, don't navigate immediately
+                                            if (item.children && item.children.length > 0) {
+                                                e.preventDefault();
+                                                // Toggle dropdown on click for touch devices
+                                                if (dropdownStates[parentIndex]) {
+                                                    hideDropdown(parentIndex);
+                                                } else {
+                                                    showDropdown(parentIndex);
+                                                }
+                                            } else if (item.link) {
+                                                // Navigate only if no children and has link
+                                                if (item.target === '_blank') {
+                                                    window.open(item.link, '_blank');
+                                                } else {
+                                                    window.location.href = item.link;
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (!isEditActionsVisible) {
+                                            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (!isEditActionsVisible) {
+                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                        }
+                                    }}
+                                >
+                                    {/* Parent icon and text */}
+                                    {item.children && item.children.length > 0 && (
+                                        <span style={{ marginRight: 4, fontSize: 12 }}>▼</span>
+                                    )}
+                                    {item.name}
+                                    {isEditActionsVisible && (
+                                        <span style={{ fontSize: 12, marginLeft: 4, opacity: 0.7 }}>
+                                            ✏️
+                                        </span>
+                                    )}
+                                </button>
+                                
+                                {/* Dropdown Menu for Child Items */}
+                                {item.children && item.children.length > 0 && dropdownStates[parentIndex] && (
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            top: '100%',
+                                            left: 0,
+                                            backgroundColor: backgroundColor,
+                                            border: `1px solid rgba(255,255,255,0.2)`,
+                                            borderRadius: 4,
+                                            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                                            minWidth: 200,
+                                            zIndex: 1001,
+                                            overflow: 'hidden'
+                                        }}
+                                        onMouseEnter={() => cancelHideDropdown(parentIndex)}
+                                        onMouseLeave={() => hideDropdown(parentIndex)}
+                                    >
+                                        {item.children.map((childItem, childIndex) => (
+                                            <button
+                                                key={`child-${parentIndex}-${childIndex}`}
+                                                style={{
+                                                    width: '100%',
+                                                    background: "none",
+                                                    border: "none",
+                                                    color: textColor,
+                                                    fontSize: fontSize - 2,
+                                                    fontWeight: 400,
+                                                    cursor: "pointer",
+                                                    padding: "12px 16px",
+                                                    textAlign: 'left',
+                                                    transition: "background-color 0.2s ease",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    borderBottom: childIndex < item.children!.length - 1 ? `1px solid rgba(255,255,255,0.1)` : 'none'
+                                                }}
+                                                title={childItem.description || childItem.name}
+                                                aria-label={`${item.name} - ${childItem.name}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (isEditActionsVisible) {
+                                                        // In edit mode, clicking opens child edit dialog
+                                                        navigationManager.openEditChildDialog(parentIndex, childIndex);
+                                                    } else {
+                                                        // Normal mode, navigate to link if available
+                                                        if (childItem.link) {
+                                                            if (childItem.target === '_blank') {
+                                                                window.open(childItem.link, '_blank');
+                                                            } else {
+                                                                window.location.href = childItem.link;
+                                                            }
+                                                        }
+                                                        // Hide dropdown after navigation
+                                                        setDropdownStates(prev => ({ ...prev, [parentIndex]: false }));
+                                                    }
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
+                                            >
+                                                <span style={{ marginRight: 8, fontSize: 10, opacity: 0.7 }}>→</span>
+                                                {childItem.name}
+                                                {isEditActionsVisible && (
+                                                    <span style={{ fontSize: 10, marginLeft: 'auto', opacity: 0.7 }}>
+                                                        ✏️
+                                                    </span>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
                                 )}
-                            </button>
+                            </div>
                         ))}
                     </div>
                     <IconButton
