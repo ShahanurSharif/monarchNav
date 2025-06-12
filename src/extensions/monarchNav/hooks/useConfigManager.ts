@@ -17,6 +17,7 @@ export interface IConfigManagerActions {
     saveConfig: () => Promise<void>;
     reloadConfig: () => Promise<void>;
     resetConfig: () => void;
+    markAsSaved: () => void;
     clearError: () => void;
 }
 
@@ -130,6 +131,10 @@ export const useConfigManager = (
         setConfig(originalConfig);
         setError(undefined);
     }, [originalConfig]);
+    
+    const markAsSaved = React.useCallback((): void => {
+        setOriginalConfig(config);
+    }, [config]);
 
     const clearError = React.useCallback((): void => {
         setError(undefined);
@@ -155,6 +160,7 @@ export const useConfigManager = (
         saveConfig,
         reloadConfig,
         resetConfig,
+        markAsSaved,
         clearError
     };
 };

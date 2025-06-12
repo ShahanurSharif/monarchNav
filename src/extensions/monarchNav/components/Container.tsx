@@ -49,8 +49,12 @@ const Container: React.FC<IContainerProps> = (props) => {
         saveConfig,
         reloadConfig,
         resetConfig,
-        updateConfig
+        updateConfig,
+        markAsSaved
     } = useConfigManager(props.context, props.config);
+
+    // UI state (must be declared before navigationManager)
+    const [isAutoSaving, setIsAutoSaving] = React.useState(false);
 
     // Navigation items management with auto-save
     const navigationManager = useNavigationManager(
@@ -63,14 +67,21 @@ const Container: React.FC<IContainerProps> = (props) => {
             
             // Auto-save navigation changes immediately
             try {
+                setIsAutoSaving(true); // Prevent unsaved changes dialog
                 updateConfig(newConfig);
                 // Save the new config directly to avoid state timing issues
                 await MonarchNavConfigService.saveConfig(props.context, newConfig);
                 console.log('Navigation changes auto-saved successfully');
+                
+                // Phase 4: Mark configuration as saved to prevent unsaved changes dialog
+                // This makes parent item operations consistent with child items and theme changes
+                markAsSaved();
             } catch (error) {
                 console.error('Failed to auto-save navigation changes:', error);
                 // Could show a toast notification here instead of alert
                 alert('Failed to save navigation changes. Please try again.');
+            } finally {
+                setIsAutoSaving(false); // Re-enable unsaved changes detection
             }
         }
     );
@@ -178,14 +189,14 @@ const Container: React.FC<IContainerProps> = (props) => {
         applySpHeaderVisibility(config.themes.is_sp_header);
     }, [config.themes.is_sp_header, applySpHeaderVisibility]);
 
-    // Show unsaved changes dialog when there are unsaved changes
+    // Show unsaved changes dialog when there are unsaved changes (but not during auto-save)
     React.useEffect(() => {
-        if (hasUnsavedChanges && !isSettingsCalloutVisible && !navigationManager.isCalloutVisible) {
+        if (hasUnsavedChanges && !isSettingsCalloutVisible && !navigationManager.isCalloutVisible && !isAutoSaving) {
             setIsUnsavedChangesDialogVisible(true);
         } else {
             setIsUnsavedChangesDialogVisible(false);
         }
-    }, [hasUnsavedChanges, isSettingsCalloutVisible, navigationManager.isCalloutVisible]);
+    }, [hasUnsavedChanges, isSettingsCalloutVisible, navigationManager.isCalloutVisible, isAutoSaving]);
 
     // Mount effect
     React.useEffect(() => {
