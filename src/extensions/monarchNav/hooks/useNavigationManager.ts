@@ -20,6 +20,9 @@ export interface INavigationManagerState {
   formData: INavigationItemForm;
   validationErrors: string[];
   isSaving: boolean;
+  isLoading: boolean;
+  error: string | undefined;
+  hasUnsavedChanges: boolean;
 }
 
 /**
@@ -58,8 +61,14 @@ export const useNavigationManager = (
     editingIndex: undefined,
     formData: initialFormData,
     validationErrors: [],
-    isSaving: false
+    isSaving: false,
+    isLoading: false,
+    error: undefined,
+    hasUnsavedChanges: false
   });
+
+  // Track initial form data to detect changes
+  const [initialFormSnapshot, setInitialFormSnapshot] = React.useState<INavigationItemForm>(initialFormData);
 
   // Validation function
   const validateForm = React.useCallback((): boolean => {
@@ -93,24 +102,30 @@ export const useNavigationManager = (
       isCalloutVisible: true,
       editingIndex: undefined,
       formData: initialFormData,
-      validationErrors: []
+      validationErrors: [],
+      hasUnsavedChanges: false
     }));
+    setInitialFormSnapshot(initialFormData);
   }, []);
 
   // Open dialog for editing existing item
   const openEditDialog = React.useCallback((index: number, item: IMonarchNavItem): void => {
+    const formData = {
+      name: item.name,
+      link: item.link,
+      target: item.target || '_self',
+      description: item.description || ''
+    };
+    
     setState(prev => ({
       ...prev,
       isCalloutVisible: true,
       editingIndex: index,
-      formData: {
-        name: item.name,
-        link: item.link,
-        target: item.target || '_self',
-        description: item.description || ''
-      },
-      validationErrors: []
+      formData,
+      validationErrors: [],
+      hasUnsavedChanges: false
     }));
+    setInitialFormSnapshot(formData);
   }, []);
 
   // Close dialog
@@ -140,53 +155,109 @@ export const useNavigationManager = (
     }));
   }, []);
 
-  // Save item (add or update)
+  // Save item (add or update) - simplified like todo item
   const saveItem = React.useCallback(async (): Promise<void> => {
-    if (!validateForm()) {
-      return;
-    }
-
-    setState(prev => ({ ...prev, isSaving: true }));
-
-    try {
-      const newItem: IMonarchNavItem = {
-        name: state.formData.name.trim(),
-        link: state.formData.link.trim(),
-        target: state.formData.target,
-        description: state.formData.description.trim() || undefined
-      };
-
-      let newItems: IMonarchNavItem[];
-
-      if (state.editingIndex !== undefined) {
-        // Update existing item
-        newItems = [...items];
-        newItems[state.editingIndex] = newItem;
-      } else {
-        // Add new item
-        newItems = [...items, newItem];
+    setState(prev => {
+      // Get current state values
+      const currentFormData = prev.formData;
+      const currentEditingIndex = prev.editingIndex;
+      
+      // Validate form
+      const errors: string[] = [];
+      if (!currentFormData.name.trim()) {
+        errors.push('Title is required');
+      }
+      if (!currentFormData.link.trim()) {
+        errors.push('Link is required');
+      }
+      
+      if (errors.length > 0) {
+        return { ...prev, validationErrors: errors };
       }
 
-      // Update items array
-      onItemsChange(newItems);
-      
-      // Close dialog
-      closeDialog();
+      // Set saving state
+      const newState = { ...prev, isSaving: true, validationErrors: [] };
 
-    } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
-        validationErrors: ['Failed to save navigation item'],
-        isSaving: false 
-      }));
-      throw error;
-    }
-  }, [state.formData, state.editingIndex, items, onItemsChange, validateForm, closeDialog]);
+      // Perform the save operation
+      setTimeout(() => {
+        try {
+          const newItem: IMonarchNavItem = {
+            name: currentFormData.name.trim(),
+            link: currentFormData.link.trim(),
+            target: currentFormData.target,
+            description: currentFormData.description.trim() || undefined
+          };
+
+          let newItems: IMonarchNavItem[];
+
+          if (currentEditingIndex !== undefined) {
+            // Update existing item at specific index
+            newItems = [...items];
+            newItems[currentEditingIndex] = newItem;
+            console.log(`Updated item at index ${currentEditingIndex}:`, newItem);
+          } else {
+            // Add new item
+            newItems = [...items, newItem];
+            console.log('Added new item:', newItem);
+          }
+
+          // Update items array
+          onItemsChange(newItems);
+          
+          // Close dialog
+          setState(finalState => ({
+            ...finalState,
+            isCalloutVisible: false,
+            editingIndex: undefined,
+            formData: initialFormData,
+            validationErrors: [],
+            isSaving: false
+          }));
+
+        } catch (error) {
+          console.error('Error saving navigation item:', error);
+          setState(errorState => ({ 
+            ...errorState, 
+            validationErrors: ['Failed to save navigation item'],
+            isSaving: false 
+          }));
+        }
+      }, 0);
+
+      return newState;
+    });
+  }, [items, onItemsChange]);
 
   // Cancel edit
   const cancelEdit = React.useCallback((): void => {
     closeDialog();
   }, [closeDialog]);
+
+  // Detect unsaved changes
+  const hasUnsavedChanges = React.useMemo(() => {
+    // For new items (not editing), consider changes if any field has content
+    if (state.editingIndex === undefined) {
+      return (
+        state.formData.name.trim() !== '' ||
+        state.formData.link.trim() !== '' ||
+        state.formData.target !== '_self' ||
+        state.formData.description.trim() !== ''
+      );
+    }
+    
+    // For editing existing items, compare with initial snapshot
+    return (
+      state.formData.name !== initialFormSnapshot.name ||
+      state.formData.link !== initialFormSnapshot.link ||
+      state.formData.target !== initialFormSnapshot.target ||
+      state.formData.description !== initialFormSnapshot.description
+    );
+  }, [state.formData, initialFormSnapshot, state.editingIndex]);
+
+  // Update hasUnsavedChanges in state
+  React.useEffect(() => {
+    setState(prev => ({ ...prev, hasUnsavedChanges }));
+  }, [hasUnsavedChanges]);
 
   return {
     // State

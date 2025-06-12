@@ -1,11 +1,42 @@
 import * as React from "react";
 import { IContainerProps } from "./IContainerProps";
-import { IconButton, Callout, Toggle, ColorPicker } from "@fluentui/react";
+import { IconButton, Callout, Toggle, ColorPicker, Dialog, DialogType, DialogFooter, PrimaryButton, DefaultButton } from "@fluentui/react";
 import { useConfigManager } from "../hooks/useConfigManager";
 import { useNavigationManager } from "../hooks/useNavigationManager";
 import { NavigationItemForm } from "./NavigationItemForm";
 
 const Container: React.FC<IContainerProps> = (props) => {
+    // Inject CSS for dialog styling
+    React.useEffect(() => {
+        const style = document.createElement('style');
+        style.id = 'monarch-nav-dialog-styles';
+        style.textContent = `
+            .monarch-nav-dialog .ms-Modal-main {
+                max-width: 591px !important;
+                width: 591px !important;
+            }
+            @media (max-width: 639px) {
+                .monarch-nav-dialog .ms-Modal-main {
+                    max-width: 90vw !important;
+                    width: 90vw !important;
+                }
+            }
+        `;
+        
+        // Only add if not already present
+        if (!document.getElementById('monarch-nav-dialog-styles')) {
+            document.head.appendChild(style);
+        }
+        
+        return () => {
+            // Cleanup on unmount
+            const existingStyle = document.getElementById('monarch-nav-dialog-styles');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+        };
+    }, []);
+
     // Use config manager hook for state management
     const {
         config,
@@ -35,6 +66,7 @@ const Container: React.FC<IContainerProps> = (props) => {
     // UI state
     const [isSettingsCalloutVisible, setIsSettingsCalloutVisible] = React.useState(false);
     const [isEditActionsVisible, setIsEditActionsVisible] = React.useState(false);
+    const [isUnsavedChangesDialogVisible, setIsUnsavedChangesDialogVisible] = React.useState(false);
 
     const settingsButtonRef = React.useRef<HTMLButtonElement>(null);
     const navigationButtonRef = React.useRef<HTMLButtonElement>(null);
@@ -75,31 +107,43 @@ const Container: React.FC<IContainerProps> = (props) => {
         try {
             await saveConfig();
             setIsSettingsCalloutVisible(false);
+            navigationManager.closeDialog(); // Close navigation dialog if open
             alert("Settings saved successfully!");
         } catch {
             alert("Error saving settings. Please try again.");
         }
-    }, [saveConfig]);
+    }, [saveConfig, navigationManager]);
 
     // Handle cancel button click
     const handleCancel = React.useCallback((): void => {
         resetConfig();
         setIsSettingsCalloutVisible(false);
-    }, [resetConfig]);
+        navigationManager.closeDialog(); // Close navigation dialog if open
+    }, [resetConfig, navigationManager]);
 
     // Handle reload button click
     const handleReload = React.useCallback(async (): Promise<void> => {
         try {
             await reloadConfig();
+            navigationManager.closeDialog(); // Close navigation dialog if open
         } catch {
             alert("Error reloading configuration. Please try again.");
         }
-    }, [reloadConfig]);
+    }, [reloadConfig, navigationManager]);
 
     // Apply SharePoint header visibility when config changes
     React.useEffect(() => {
         applySpHeaderVisibility(config.themes.is_sp_header);
     }, [config.themes.is_sp_header, applySpHeaderVisibility]);
+
+    // Show unsaved changes dialog when there are unsaved changes
+    React.useEffect(() => {
+        if (hasUnsavedChanges && !isSettingsCalloutVisible && !navigationManager.isCalloutVisible) {
+            setIsUnsavedChangesDialogVisible(true);
+        } else {
+            setIsUnsavedChangesDialogVisible(false);
+        }
+    }, [hasUnsavedChanges, isSettingsCalloutVisible, navigationManager.isCalloutVisible]);
 
     // Mount effect
     React.useEffect(() => {
@@ -176,6 +220,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                             </button>
                             {isSettingsCalloutVisible && (
                                 <Callout
+                                    id="theme_callout"
                                     target={settingsButtonRef.current}
                                     onDismiss={() => setIsSettingsCalloutVisible(false)}
                                     setInitialFocus
@@ -349,7 +394,10 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         formData={navigationManager.formData}
                                         validationErrors={navigationManager.validationErrors}
                                         isSaving={navigationManager.isSaving}
+                                        isLoading={navigationManager.isLoading}
                                         isEditing={navigationManager.editingIndex !== undefined}
+                                        error={navigationManager.error}
+                                        hasUnsavedChanges={navigationManager.hasUnsavedChanges}
                                         onFieldChange={navigationManager.updateFormField}
                                         onSave={navigationManager.saveItem}
                                         onCancel={navigationManager.cancelEdit}
@@ -443,6 +491,65 @@ const Container: React.FC<IContainerProps> = (props) => {
                 </span>
                 {/* right side empty for now */}
                 <div />
+            </div>
+
+            {/* Unsaved Changes Dialog */}
+            <div style={{ 
+                /* Global CSS override for dialog max-width */
+                '--dialog-max-width': '591px'
+            } as React.CSSProperties}>
+                <Dialog
+                    hidden={!isUnsavedChangesDialogVisible}
+                    onDismiss={() => setIsUnsavedChangesDialogVisible(false)}
+                    dialogContentProps={{
+                        type: DialogType.normal,
+                        title: 'Unsaved Changes',
+                        subText: 'You have unsaved changes to your configuration. Would you like to save them now?'
+                    }}
+                    modalProps={{
+                        isBlocking: true,
+                        className: 'monarch-nav-dialog',
+                        styles: {
+                            main: {
+                                maxWidth: '591px !important',
+                                width: '591px',
+                                '@media (max-width: 639px)': {
+                                    maxWidth: '90vw !important',
+                                    width: '90vw'
+                                }
+                            }
+                        }
+                    }}
+                    styles={{
+                        main: {
+                            maxWidth: '591px !important',
+                            width: '591px',
+                            '@media (max-width: 639px)': {
+                                maxWidth: '90vw !important',
+                                width: '90vw'
+                            }
+                        }
+                    }}
+            >
+                <DialogFooter>
+                    <DefaultButton 
+                        onClick={() => {
+                            handleCancel();
+                            setIsUnsavedChangesDialogVisible(false);
+                        }}
+                        disabled={isSaving}
+                        text="Discard Changes" 
+                    />
+                    <PrimaryButton 
+                        onClick={async () => {
+                            await handleSave();
+                            setIsUnsavedChangesDialogVisible(false);
+                        }}
+                        disabled={isSaving}
+                        text={isSaving ? 'Saving...' : 'Save Changes'} 
+                    />
+                </DialogFooter>
+                </Dialog>
             </div>
         </div>
     );
