@@ -1,5 +1,7 @@
 # MonarchNav SPFx Extension - Installation & Usage Guide
 
+**Version:** 1.0
+
 ## Overview
 MonarchNav is a SharePoint Framework (SPFx) Application Customizer that provides a modern, configurable navigation bar for SharePoint Online. It supports hierarchical navigation, custom branding, and persistent configuration stored in Site Assets.
 
