@@ -269,27 +269,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
                                     {isLoading && <div style={{ color: '#0078d4', marginBottom: 8 }}>Loading...</div>}
                                     
-                                    {/* Reload button */}
-                                    <div style={{ marginBottom: 16, textAlign: 'right' }}>
-                                        <button
-                                            style={{
-                                                backgroundColor: "#f3f2f1",
-                                                color: "#323130",
-                                                border: "1px solid #d2d0ce",
-                                                borderRadius: 2,
-                                                padding: "4px 12px",
-                                                fontSize: 12,
-                                                cursor: "pointer",
-                                                fontWeight: 400
-                                            }}
-                                            onClick={handleReload}
-                                            disabled={isLoading || isSaving}
-                                            title="Reload configuration from SharePoint"
-                                        >
-                                            🔄 Reload
-                                        </button>
-                                    </div>
-                                    
                                     {/* SharePoint Header Toggle */}
                                     <Toggle
                                         label="Show SharePoint Header"
@@ -299,7 +278,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     
                                     {/* Background color picker */}
                                     <div style={{ marginTop: 16 }}>
-                                        <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                                        <div style={{ marginBottom: 4 }}>
                                             Header Background Color
                                         </div>
                                         <ColorPicker
@@ -314,7 +293,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     
                                     {/* Font color picker */}
                                     <div style={{ marginTop: 16 }}>
-                                        <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                                        <div style={{ marginBottom: 4 }}>
                                             Menu Items Font Color
                                         </div>
                                         <ColorPicker
@@ -328,8 +307,8 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     </div>
                                     
                                     {/* Font size slider */}
-                                    <div style={{ marginTop: 16 }}>
-                                        <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                                    <div style={{ marginTop: 16, padding: 15 }}>
+                                        <div style={{ marginBottom: 4 }}>
                                             Menu Items Font Size
                                         </div>
                                         <input
@@ -351,6 +330,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         marginTop: 20, 
                                         display: "flex", 
                                         gap: 8, 
+                                        padding: "0 15px",
                                         justifyContent: "flex-end" 
                                     }}>
                                         <button
@@ -361,8 +341,23 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                 borderRadius: 2,
                                                 padding: "6px 16px",
                                                 fontSize: 14,
-                                                cursor: "pointer",
-                                                fontWeight: 400
+                                                cursor: "pointer"
+                                            }}
+                                            onClick={handleReload}
+                                            disabled={isLoading || isSaving}
+                                            title="Reload configuration from SharePoint"
+                                        >
+                                            🔄 Reload
+                                        </button>
+                                        <button
+                                            style={{
+                                                backgroundColor: "#f3f2f1",
+                                                color: "#323130",
+                                                border: "1px solid #d2d0ce",
+                                                borderRadius: 2,
+                                                padding: "6px 16px",
+                                                fontSize: 14,
+                                                cursor: "pointer"
                                             }}
                                             onClick={handleCancel}
                                             disabled={isSaving}
@@ -377,8 +372,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                 borderRadius: 2,
                                                 padding: "6px 16px",
                                                 fontSize: 14,
-                                                cursor: hasUnsavedChanges && !isSaving ? "pointer" : "default",
-                                                fontWeight: 600
+                                                cursor: hasUnsavedChanges && !isSaving ? "pointer" : "default"
                                             }}
                                             onClick={handleSave}
                                             disabled={!hasUnsavedChanges || isSaving}
@@ -395,7 +389,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     color: "#0078d4",
                                     border: "none",
                                     fontSize: 16,
-                                    fontWeight: 600,
                                     cursor: "pointer",
                                     padding: "8px 16px",
                                     borderRadius: 4,
@@ -420,6 +413,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         root: {
                                             maxWidth: 400,
                                             boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+                                            padding: "0 15px"
                                         },
                                     }}
                                 >
@@ -481,7 +475,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         border: "none",
                                         color: textColor,
                                         fontSize: fontSize,
-                                        fontWeight: 600,
                                         cursor: "pointer",
                                         padding: "8px 16px",
                                         borderRadius: 4,
@@ -533,9 +526,33 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     )}
                                     {item.name}
                                     {isEditActionsVisible && (
-                                        <span style={{ fontSize: 12, marginLeft: 4, opacity: 0.7 }}>
-                                            ✏️
-                                        </span>
+                                        <IconButton
+                                            iconProps={{ iconName: "Edit" }}
+                                            title="Edit Parent"
+                                            ariaLabel="Edit Parent"
+                                            styles={{
+                                                root: {
+                                                    fontSize: 12,
+                                                    color: "white",
+                                                    background: "gray",
+                                                    borderRadius: 3,
+                                                    marginLeft: 6,
+                                                    padding: 2,
+                                                    height: 20,
+                                                    width: 20,
+                                                    minWidth: 20,
+                                                    minHeight: 20,
+                                                    lineHeight: "16px"
+                                                },
+                                                icon: {
+                                                    fontSize: 12
+                                                }
+                                            }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigationManager.openEditDialog(parentIndex, config.items[parentIndex]);
+                                            }}
+                                        />
                                     )}
                                 </button>
                                 
@@ -546,13 +563,15 @@ const Container: React.FC<IContainerProps> = (props) => {
                                             position: 'absolute',
                                             top: '100%',
                                             left: 0,
-                                            backgroundColor: backgroundColor,
+                                            backgroundColor: backgroundColor, // Use theme background
                                             border: `1px solid rgba(255,255,255,0.2)`,
                                             borderRadius: 4,
                                             boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                                             minWidth: 200,
                                             zIndex: 1001,
-                                            overflow: 'hidden'
+                                            overflow: 'hidden',
+                                            marginTop: 2,
+                                            padding: 4
                                         }}
                                         onMouseEnter={() => cancelHideDropdown(parentIndex)}
                                         onMouseLeave={() => hideDropdown(parentIndex)}
@@ -562,28 +581,29 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                 key={`child-${parentIndex}-${childIndex}`}
                                                 style={{
                                                     width: '100%',
-                                                    background: "none",
-                                                    border: "none",
-                                                    color: textColor,
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    color: textColor, // Use theme text color
                                                     fontSize: fontSize - 2,
-                                                    fontWeight: 400,
-                                                    cursor: "pointer",
-                                                    padding: "12px 16px",
+                                                    cursor: 'pointer',
+                                                    padding: '10px 16px',
                                                     textAlign: 'left',
-                                                    transition: "background-color 0.2s ease",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    borderBottom: childIndex < item.children!.length - 1 ? `1px solid rgba(255,255,255,0.1)` : 'none'
+                                                    transition: 'background-color 0.2s ease',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'flex-start',
+                                                    borderBottom: childIndex < item.children!.length - 1 ? `1px solid rgba(255,255,255,0.1)` : 'none',
+                                                    borderRadius: 0,
+                                                    minHeight: 40,
+                                                    position: 'relative',
                                                 }}
                                                 title={childItem.description || childItem.name}
                                                 aria-label={`${item.name} - ${childItem.name}`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     if (isEditActionsVisible) {
-                                                        // In edit mode, clicking opens child edit dialog
                                                         navigationManager.openEditChildDialog(parentIndex, childIndex);
                                                     } else {
-                                                        // Normal mode, navigate to link if available
                                                         if (childItem.link) {
                                                             if (childItem.target === '_blank') {
                                                                 window.open(childItem.link, '_blank');
@@ -591,7 +611,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                                 window.location.href = childItem.link;
                                                             }
                                                         }
-                                                        // Hide dropdown after navigation
                                                         setDropdownStates(prev => ({ ...prev, [parentIndex]: false }));
                                                     }
                                                 }}
@@ -602,12 +621,53 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                     e.currentTarget.style.backgroundColor = 'transparent';
                                                 }}
                                             >
-                                                <span style={{ marginRight: 8, fontSize: 10, opacity: 0.7 }}>→</span>
-                                                {childItem.name}
-                                                {isEditActionsVisible && (
-                                                    <span style={{ fontSize: 10, marginLeft: 'auto', opacity: 0.7 }}>
-                                                        ✏️
-                                                    </span>
+                                                <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                                                    <span style={{ marginRight: 8, fontSize: 10, opacity: 0.7 }}>→</span>
+                                                    <span>{childItem.name}</span>
+                                                    {isEditActionsVisible && (
+                                                        <IconButton
+                                                            iconProps={{ iconName: "Edit" }}
+                                                            title="Edit Child"
+                                                            ariaLabel="Edit Child"
+                                                            styles={{
+                                                                root: {
+                                                                    fontSize: 12,
+                                                                    color: "white",
+                                                                    background: "gray",
+                                                                    borderRadius: 3,
+                                                                    marginLeft: 6,
+                                                                    padding: 2,
+                                                                    height: 20,
+                                                                    width: 20,
+                                                                    minWidth: 20,
+                                                                    minHeight: 20,
+                                                                    lineHeight: "16px"
+                                                                },
+                                                                icon: {
+                                                                    fontSize: 12
+                                                                }
+                                                            }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                navigationManager.openEditChildDialog(parentIndex, childIndex);
+                                                            }}
+                                                        />
+                                                    )}
+                                                </div>
+                                                {/* Description below name, SharePoint style */}
+                                                {childItem.description && childItem.description.trim() !== '' && (
+                                                    <div style={{
+                                                        fontSize: `${fontSize - 2}px`,
+                                                        color: textColor, // Use theme text color for description
+                                                        marginLeft: 22,
+                                                        marginTop: 2,
+                                                        whiteSpace: 'normal',
+                                                        lineHeight: 1.3,
+                                                        maxWidth: 260,
+                                                        opacity: 0.85
+                                                    }}>
+                                                        {childItem.description}
+                                                    </div>
                                                 )}
                                             </button>
                                         ))}
@@ -621,7 +681,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                         title="Edit"
                         ariaLabel="Edit"
                         styles={{
-                            root: { color: "white", background: "none" },
+                            root: { color: "white", background: "gray" },
                         }}
                         onClick={() => {
                             setIsEditActionsVisible(!isEditActionsVisible);
@@ -629,15 +689,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                         }}
                     />
                 </div>
-                {/* title in the center */}
-                <span
-                    style={{
-                        fontSize: 20,
-                        fontWeight: 600,
-                    }}
-                >
-                    MonarchNav
-                </span>
                 {/* right side empty for now */}
                 <div />
             </div>
