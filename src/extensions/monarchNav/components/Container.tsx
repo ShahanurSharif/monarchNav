@@ -4,6 +4,7 @@ import { IconButton, Callout, Toggle, ColorPicker } from "@fluentui/react";
 import { useConfigManager } from "../hooks/useConfigManager";
 import { useNavigationManager } from "../hooks/useNavigationManager";
 import { MonarchNavConfigService } from "../MonarchNavConfigService";
+import { NavigationItemForm } from "../components/NavigationItemForm";
 
 const Container: React.FC<IContainerProps> = (props) => {
     // Inject CSS for dialog styling
@@ -69,8 +70,8 @@ const Container: React.FC<IContainerProps> = (props) => {
                 console.log('Navigation changes auto-saved successfully');
             } catch (error) {
                 console.error('Failed to auto-save navigation changes:', error);
-                // Could show a toast notification here instead of alert
-                alert('Failed to save navigation changes. Please try again.');
+                // TODO: Integrate a professional notification/toast system here
+                console.error('Failed to save navigation changes. Please try again.');
             }
         }
     );
@@ -149,9 +150,11 @@ const Container: React.FC<IContainerProps> = (props) => {
             await saveConfig();
             setIsSettingsCalloutVisible(false);
             navigationManager.closeDialog(); // Close navigation dialog if open
-            alert("Settings saved successfully!");
+            // TODO: Integrate a professional notification/toast system here
+            console.log("Settings saved successfully!");
         } catch {
-            alert("Error saving settings. Please try again.");
+            // TODO: Integrate a professional notification/toast system here
+            console.error("Error saving settings. Please try again.");
         }
     }, [saveConfig, navigationManager]);
 
@@ -168,7 +171,8 @@ const Container: React.FC<IContainerProps> = (props) => {
             await reloadConfig();
             navigationManager.closeDialog(); // Close navigation dialog if open
         } catch {
-            alert("Error reloading configuration. Please try again.");
+            // TODO: Integrate a professional notification/toast system here
+            console.error("Error reloading configuration. Please try again.");
         }
     }, [reloadConfig, navigationManager]);
 
@@ -258,7 +262,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     border: "none",
                                     fontSize: 16,
                                     cursor: "pointer",
-                                    padding: "8px 16px",
+                                    padding: "4px 4px",
                                     borderRadius: 4,
                                     marginRight: 4,
                                     transition: "background-color 0.2s ease",
@@ -389,7 +393,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                             }}
                                         />
                                         {/* Logo Resize Slider */}
-                                        <div style={{ marginTop: 8 }}>
+                                        <div style={{ marginTop: 8, padding: 15 }}>
                                             <div style={{ marginBottom: 4 }}>Logo Size</div>
                                             <input
                                                 type="range"
@@ -406,7 +410,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     </div>
 
                                     {/* Font Style Dropdown */}
-                                    <div style={{ marginTop: 16 }}>
+                                    <div style={{ marginTop: 16, padding: 15 }}>
                                         <div style={{ marginBottom: 4 }}>Menu Font Style</div>
                                         <select
                                             value={config.themes.fontStyle || "normal"}
@@ -486,6 +490,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                             display: "flex",
                             alignItems: "center",
                             gap: 8,
+                            padding: 4, // Added padding to menu items container
                         }}
                     >
                         {/* Enhanced hierarchical navigation with dropdown menus */}
@@ -515,7 +520,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         fontWeight: fontStyle === "bold" ? "bold" : "normal",
                                         fontStyle: fontStyle === "italic" ? "italic" : "normal",
                                         cursor: "pointer",
-                                        padding: "8px 16px",
+                                        padding: "6px",
                                         borderRadius: 4,
                                         transition: "background-color 0.2s ease",
                                         display: "flex",
@@ -730,6 +735,47 @@ const Container: React.FC<IContainerProps> = (props) => {
                 {/* right side empty for now */}
                 <div />
             </div>
+            {/* Restore Navigation Add/Edit Callout */}
+            {navigationManager.isCalloutVisible && (
+              <Callout
+                id="navigation_callout"
+                target={navigationButtonRef.current}
+                onDismiss={navigationManager.cancelEdit}
+                setInitialFocus
+                styles={{
+                  root: {
+                    maxWidth: 400,
+                    padding: 0,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                    zIndex: 2000
+                  }
+                }}
+              >
+                <NavigationItemForm
+                  formData={navigationManager.formData}
+                  validationErrors={navigationManager.validationErrors}
+                  isSaving={navigationManager.isSaving}
+                  isLoading={navigationManager.isLoading}
+                  isEditing={!!navigationManager.editingContext}
+                  error={navigationManager.error}
+                  hasUnsavedChanges={navigationManager.hasUnsavedChanges}
+                  onFieldChange={navigationManager.updateFormField}
+                  onSave={navigationManager.saveItem}
+                  onCancel={navigationManager.cancelEdit}
+                  getFormTitle={navigationManager.getFormTitle}
+                  isChildForm={navigationManager.isChildForm}
+                  canAddChild={navigationManager.canAddChild}
+                  onAddChild={() => {
+                    if (
+                      navigationManager.editingContext &&
+                      typeof navigationManager.editingContext.parentIndex === 'number'
+                    ) {
+                      navigationManager.openAddChildDialog(navigationManager.editingContext.parentIndex);
+                    }
+                  }}
+                />
+              </Callout>
+            )}
         </div>
     );
 };

@@ -28,7 +28,8 @@ const navigationManager = useNavigationManager(
             console.log('Navigation changes auto-saved successfully');
         } catch (error) {
             console.error('Failed to auto-save navigation changes:', error);
-            alert('Failed to save navigation changes. Please try again.');
+            // TODO: Integrate a professional notification/toast system here
+            // Example: showToast('Failed to save navigation changes. Please try again.', 'error');
         }
     }
 );
@@ -129,7 +130,8 @@ try {
     // Save operation
 } catch (error) {
     console.error('Failed to auto-save navigation changes:', error);
-    alert('Failed to save navigation changes. Please try again.');
+    // TODO: Integrate a professional notification/toast system here
+    // Example: showToast('Failed to save navigation changes. Please try again.', 'error');
 }
 ```
 

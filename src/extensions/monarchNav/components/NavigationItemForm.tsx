@@ -66,19 +66,15 @@ export const NavigationItemForm: React.FC<INavigationItemFormProps> = ({
       await onSave();
     } catch (error) {
       console.error('Error saving navigation item:', error);
-      alert("Error saving navigation item. Please try again.");
+      // TODO: Integrate a professional notification/toast system here
+      console.error("Error saving navigation item. Please try again.");
     }
   };
 
   // Handle cancel - simplified
   const handleCancel = (): void => {
     // Only ask for confirmation if there's actual content in the form
-    const hasContent = formData.name.trim() || formData.link.trim() || formData.description.trim();
-    
-    if (hasContent) {
-      const confirmed = confirm("Are you sure you want to cancel? Your changes will be lost.");
-      if (!confirmed) return;
-    }
+    // TODO: Replace with a custom non-blocking confirmation dialog/modal for unsaved changes
     onCancel();
   };
 
