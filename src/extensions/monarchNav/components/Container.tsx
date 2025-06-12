@@ -369,11 +369,11 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     marginRight: 4,
                                     transition: "background-color 0.2s ease",
                                 }}
-                                title="Add/Edit Navigation"
-                                aria-label="Add/Edit Navigation"
+                                title="Add Navigation"
+                                aria-label="Add Navigation"
                                 onClick={navigationManager.openAddDialog}
                             >
-                                Add/Edit Navigation
+                                Add Navigation
                             </button>
 
                             {/* Navigation Item Form Callout */}
