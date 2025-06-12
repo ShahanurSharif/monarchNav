@@ -622,7 +622,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                 }}
                                             >
                                                 <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                                                    <span style={{ marginRight: 8, fontSize: 10, opacity: 0.7 }}>→</span>
                                                     <span>{childItem.name}</span>
                                                     {isEditActionsVisible && (
                                                         <IconButton
