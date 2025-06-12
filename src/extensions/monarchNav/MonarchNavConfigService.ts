@@ -138,7 +138,12 @@ export class MonarchNavConfigService {
       if (response.ok) {
         Log.info(LOG_SOURCE, "Configuration saved successfully to deployed file");
       } else {
-        const errorData = await response.json();
+        let errorData: unknown = null;
+        try {
+          errorData = await response.clone().json();
+        } catch {
+          errorData = await response.text();
+        }
         Log.error(LOG_SOURCE, new Error(`Failed to save config: ${JSON.stringify(errorData)}`));
         throw new Error("Failed to save configuration");
       }

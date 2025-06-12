@@ -3,7 +3,6 @@ import { IContainerProps } from "./IContainerProps";
 import { IconButton, Callout, Toggle, ColorPicker } from "@fluentui/react";
 import { useConfigManager } from "../hooks/useConfigManager";
 import { useNavigationManager } from "../hooks/useNavigationManager";
-import { NavigationItemForm } from "./NavigationItemForm";
 import { MonarchNavConfigService } from "../MonarchNavConfigService";
 
 const Container: React.FC<IContainerProps> = (props) => {
@@ -230,17 +229,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                         gap: 8,
                     }}
                 >
-                    {/* Logo rendering using config.themes.logoUrl and logoSize */}
-                    <img
-                        src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
-                        alt="Logo"
-                        style={{
-                            height: config.themes.logoSize || "40px",
-                            width: "auto",
-                            marginRight: 16,
-                            background: "transparent"
-                        }}
-                    />
+                    {/* Only one Settings and Add Navigation button group to the left of the logo */}
                     {isEditActionsVisible && (
                         <>
                             <button
@@ -259,10 +248,42 @@ const Container: React.FC<IContainerProps> = (props) => {
                                 aria-label="Settings"
                                 onClick={() => setIsSettingsCalloutVisible(!isSettingsCalloutVisible)}
                             >
-                                <span role="img" aria-label="Settings">
-                                    ⚙️
-                                </span>
+                                <span role="img" aria-label="Settings">⚙️</span>
                             </button>
+                            <button
+                                ref={navigationButtonRef}
+                                style={{
+                                    background: "#fff",
+                                    color: "#0078d4",
+                                    border: "none",
+                                    fontSize: 16,
+                                    cursor: "pointer",
+                                    padding: "8px 16px",
+                                    borderRadius: 4,
+                                    marginRight: 4,
+                                    transition: "background-color 0.2s ease",
+                                }}
+                                title="Add Navigation"
+                                aria-label="Add Navigation"
+                                onClick={navigationManager.openAddDialog}
+                            >
+                                Add Navigation
+                            </button>
+                        </>
+                    )}
+                    {/* Logo */}
+                    <img
+                        src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
+                        alt="Logo"
+                        style={{
+                            height: config.themes.logoSize || "40px",
+                            width: "auto",
+                            marginRight: 16,
+                            background: "transparent"
+                        }}
+                    />
+                    {isEditActionsVisible && (
+                        <>
                             {isSettingsCalloutVisible && (
                                 <Callout
                                     id="theme_callout"
@@ -453,63 +474,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                                             {isSaving ? "Saving..." : "Save"}
                                         </button>
                                     </div>
-                                </Callout>
-                            )}
-                            <button
-                                ref={navigationButtonRef}
-                                style={{
-                                    background: "#fff",
-                                    color: "#0078d4",
-                                    border: "none",
-                                    fontSize: 16,
-                                    cursor: "pointer",
-                                    padding: "8px 16px",
-                                    borderRadius: 4,
-                                    marginRight: 4,
-                                    transition: "background-color 0.2s ease",
-                                }}
-                                title="Add Navigation"
-                                aria-label="Add Navigation"
-                                onClick={navigationManager.openAddDialog}
-                            >
-                                Add Navigation
-                            </button>
-
-                            {/* Navigation Item Form Callout */}
-                            {navigationManager.isCalloutVisible && (
-                                <Callout
-                                    id="navigation_callout"
-                                    target={navigationButtonRef.current}
-                                    onDismiss={navigationManager.closeDialog}
-                                    setInitialFocus
-                                    styles={{
-                                        root: {
-                                            maxWidth: 400,
-                                            boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-                                            padding: "0 15px"
-                                        },
-                                    }}
-                                >
-                                    <NavigationItemForm
-                                        formData={navigationManager.formData}
-                                        validationErrors={navigationManager.validationErrors}
-                                        isSaving={navigationManager.isSaving}
-                                        isLoading={navigationManager.isLoading}
-                                        isEditing={navigationManager.editingIndex !== undefined}
-                                        error={navigationManager.error}
-                                        hasUnsavedChanges={navigationManager.hasUnsavedChanges}
-                                        onFieldChange={navigationManager.updateFormField}
-                                        onSave={navigationManager.saveItem}
-                                        onCancel={navigationManager.cancelEdit}
-                                        getFormTitle={navigationManager.getFormTitle}
-                                        isChildForm={navigationManager.isChildForm}
-                                        canAddChild={navigationManager.canAddChild}
-                                        onAddChild={() => {
-                                            if (navigationManager.editingContext?.type === 'edit-parent') {
-                                                navigationManager.openAddChildDialog(navigationManager.editingContext.parentIndex);
-                                            }
-                                        }}
-                                    />
                                 </Callout>
                             )}
                         </>
