@@ -1,6 +1,6 @@
 import * as React from "react";
 import { IContainerProps } from "./IContainerProps";
-import { IconButton, Callout, Toggle, ColorPicker, Dialog, DialogType, DialogFooter, PrimaryButton, DefaultButton } from "@fluentui/react";
+import { IconButton, Callout, Toggle, ColorPicker } from "@fluentui/react";
 import { useConfigManager } from "../hooks/useConfigManager";
 import { useNavigationManager } from "../hooks/useNavigationManager";
 import { NavigationItemForm } from "./NavigationItemForm";
@@ -53,9 +53,6 @@ const Container: React.FC<IContainerProps> = (props) => {
         markAsSaved
     } = useConfigManager(props.context, props.config);
 
-    // UI state (must be declared before navigationManager)
-    const [isAutoSaving, setIsAutoSaving] = React.useState(false);
-
     // Navigation items management with auto-save
     const navigationManager = useNavigationManager(
         config.items,
@@ -66,7 +63,6 @@ const Container: React.FC<IContainerProps> = (props) => {
             };
             // Auto-save navigation changes immediately
             try {
-                setIsAutoSaving(true); // Prevent unsaved changes dialog
                 markAsSaved(); // Mark as saved BEFORE updateConfig to avoid race condition
                 updateConfig(newConfig);
                 // Save the new config directly to avoid state timing issues
@@ -76,8 +72,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                 console.error('Failed to auto-save navigation changes:', error);
                 // Could show a toast notification here instead of alert
                 alert('Failed to save navigation changes. Please try again.');
-            } finally {
-                setIsAutoSaving(false); // Re-enable unsaved changes detection
             }
         }
     );
@@ -85,7 +79,6 @@ const Container: React.FC<IContainerProps> = (props) => {
     // UI state
     const [isSettingsCalloutVisible, setIsSettingsCalloutVisible] = React.useState(false);
     const [isEditActionsVisible, setIsEditActionsVisible] = React.useState(false);
-    const [isUnsavedChangesDialogVisible, setIsUnsavedChangesDialogVisible] = React.useState(false);
 
     const settingsButtonRef = React.useRef<HTMLButtonElement>(null);
     const navigationButtonRef = React.useRef<HTMLButtonElement>(null);
@@ -184,15 +177,6 @@ const Container: React.FC<IContainerProps> = (props) => {
     React.useEffect(() => {
         applySpHeaderVisibility(config.themes.is_sp_header);
     }, [config.themes.is_sp_header, applySpHeaderVisibility]);
-
-    // Show unsaved changes dialog when there are unsaved changes (but not during auto-save)
-    React.useEffect(() => {
-        if (hasUnsavedChanges && !isSettingsCalloutVisible && !navigationManager.isCalloutVisible && !isAutoSaving) {
-            setIsUnsavedChangesDialogVisible(true);
-        } else {
-            setIsUnsavedChangesDialogVisible(false);
-        }
-    }, [hasUnsavedChanges, isSettingsCalloutVisible, navigationManager.isCalloutVisible, isAutoSaving]);
 
     // Mount effect
     React.useEffect(() => {
@@ -656,65 +640,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                 </span>
                 {/* right side empty for now */}
                 <div />
-            </div>
-
-            {/* Unsaved Changes Dialog */}
-            <div style={{ 
-                /* Global CSS override for dialog max-width */
-                '--dialog-max-width': '591px'
-            } as React.CSSProperties}>
-                <Dialog
-                    hidden={!isUnsavedChangesDialogVisible}
-                    onDismiss={() => setIsUnsavedChangesDialogVisible(false)}
-                    dialogContentProps={{
-                        type: DialogType.normal,
-                        title: 'Unsaved Changes',
-                        subText: 'You have unsaved changes to your configuration. Would you like to save them now?'
-                    }}
-                    modalProps={{
-                        isBlocking: true,
-                        className: 'monarch-nav-dialog',
-                        styles: {
-                            main: {
-                                maxWidth: '591px !important',
-                                width: '591px',
-                                '@media (max-width: 639px)': {
-                                    maxWidth: '90vw !important',
-                                    width: '90vw'
-                                }
-                            }
-                        }
-                    }}
-                    styles={{
-                        main: {
-                            maxWidth: '591px !important',
-                            width: '591px',
-                            '@media (max-width: 639px)': {
-                                maxWidth: '90vw !important',
-                                width: '90vw'
-                            }
-                        }
-                    }}
-            >
-                <DialogFooter>
-                    <DefaultButton 
-                        onClick={() => {
-                            handleCancel();
-                            setIsUnsavedChangesDialogVisible(false);
-                        }}
-                        disabled={isSaving}
-                        text="Discard Changes" 
-                    />
-                    <PrimaryButton 
-                        onClick={async () => {
-                            await handleSave();
-                            setIsUnsavedChangesDialogVisible(false);
-                        }}
-                        disabled={isSaving}
-                        text={isSaving ? 'Saving...' : 'Save Changes'} 
-                    />
-                </DialogFooter>
-                </Dialog>
             </div>
         </div>
     );
