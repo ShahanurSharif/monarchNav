@@ -13,13 +13,14 @@
     "outDir": "lib",
     "inlineSources": false,
     "noImplicitAny": true,
-
+    "rootDir": ".",
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@microsoft"
     ],
     "types": [
-      "webpack-env"
+      "webpack-env",
+      "jest"
     ],
     "lib": [
       "es5",
@@ -30,6 +31,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
   ]
 }
