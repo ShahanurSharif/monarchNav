@@ -3,7 +3,7 @@
   "solution": {
     "name": "monarch-nav-client-side-solution",
     "id": "4cd29abd-f439-4525-acca-f7849d4e3620",
-    "version": "1.0.0.0",
+    "version": "1.1.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": false,
     "isDomainIsolated": false,
@@ -30,7 +30,7 @@
         "title": "Application Extension - Deployment of custom action",
         "description": "Deploys a custom action with ClientSideComponentId association",
         "id": "7c7c26cf-e427-4095-afad-7fce1ca277fa",
-        "version": "1.0.0.0",
+        "version": "1.1.0.0",
         "assets": {
           "elementManifests": [
             "elements.xml",
