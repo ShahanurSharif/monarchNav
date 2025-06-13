@@ -570,33 +570,64 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     )}
                                     {item.name}
                                     {isEditActionsVisible && (
-                                        <IconButton
-                                            iconProps={{ iconName: "Edit" }}
-                                            title="Edit Parent"
-                                            ariaLabel="Edit Parent"
-                                            styles={{
-                                                root: {
-                                                    fontSize: 12,
-                                                    color: "white",
-                                                    background: "gray",
-                                                    borderRadius: 3,
-                                                    marginLeft: 6,
-                                                    padding: 2,
-                                                    height: 20,
-                                                    width: 20,
-                                                    minWidth: 20,
-                                                    minHeight: 20,
-                                                    lineHeight: "16px"
-                                                },
-                                                icon: {
-                                                    fontSize: 12
-                                                }
-                                            }}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigationManager.openEditDialog(parentIndex, config.items[parentIndex]);
-                                            }}
-                                        />
+                                        <>
+                                            <IconButton
+                                                iconProps={{ iconName: "Edit" }}
+                                                title="Edit Parent"
+                                                ariaLabel="Edit Parent"
+                                                styles={{
+                                                    root: {
+                                                        fontSize: 12,
+                                                        color: "white",
+                                                        background: "gray",
+                                                        borderRadius: 3,
+                                                        marginLeft: 6,
+                                                        padding: 2,
+                                                        height: 20,
+                                                        width: 20,
+                                                        minWidth: 20,
+                                                        minHeight: 20,
+                                                        lineHeight: "16px"
+                                                    },
+                                                    icon: {
+                                                        fontSize: 12
+                                                    }
+                                                }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigationManager.openEditDialog(parentIndex, config.items[parentIndex]);
+                                                }}
+                                            />
+                                            <IconButton
+                                                iconProps={{ iconName: "Delete" }}
+                                                title="Delete Parent"
+                                                ariaLabel="Delete Parent"
+                                                styles={{
+                                                    root: {
+                                                        fontSize: 12,
+                                                        color: "#d13438",
+                                                        background: "transparent",
+                                                        borderRadius: 3,
+                                                        marginLeft: 4,
+                                                        padding: 2,
+                                                        height: 20,
+                                                        width: 20,
+                                                        minWidth: 20,
+                                                        minHeight: 20,
+                                                        lineHeight: "16px"
+                                                    },
+                                                    icon: {
+                                                        fontSize: 12
+                                                    }
+                                                }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (window.confirm(`Are you sure you want to delete parent item '${item.name}'?`)) {
+                                                        navigationManager.deleteParentItem(parentIndex);
+                                                    }
+                                                }}
+                                            />
+                                        </>
                                     )}
                                 </button>
                                 
@@ -668,33 +699,64 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                 <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                                                     <span>{childItem.name}</span>
                                                     {isEditActionsVisible && (
-                                                        <IconButton
-                                                            iconProps={{ iconName: "Edit" }}
-                                                            title="Edit Child"
-                                                            ariaLabel="Edit Child"
-                                                            styles={{
-                                                                root: {
-                                                                    fontSize: 12,
-                                                                    color: "white",
-                                                                    background: "gray",
-                                                                    borderRadius: 3,
-                                                                    marginLeft: 6,
-                                                                    padding: 2,
-                                                                    height: 20,
-                                                                    width: 20,
-                                                                    minWidth: 20,
-                                                                    minHeight: 20,
-                                                                    lineHeight: "16px"
-                                                                },
-                                                                icon: {
-                                                                    fontSize: 12
-                                                                }
-                                                            }}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                navigationManager.openEditChildDialog(parentIndex, childIndex);
-                                                            }}
-                                                        />
+                                                        <>
+                                                            <IconButton
+                                                                iconProps={{ iconName: "Edit" }}
+                                                                title="Edit Child"
+                                                                ariaLabel="Edit Child"
+                                                                styles={{
+                                                                    root: {
+                                                                        fontSize: 12,
+                                                                        color: "white",
+                                                                        background: "gray",
+                                                                        borderRadius: 3,
+                                                                        marginLeft: 6,
+                                                                        padding: 2,
+                                                                        height: 20,
+                                                                        width: 20,
+                                                                        minWidth: 20,
+                                                                        minHeight: 20,
+                                                                        lineHeight: "16px"
+                                                                    },
+                                                                    icon: {
+                                                                        fontSize: 12
+                                                                    }
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    navigationManager.openEditChildDialog(parentIndex, childIndex);
+                                                                }}
+                                                            />
+                                                            <IconButton
+                                                                iconProps={{ iconName: "Delete" }}
+                                                                title="Delete Child"
+                                                                ariaLabel="Delete Child"
+                                                                styles={{
+                                                                    root: {
+                                                                        fontSize: 12,
+                                                                        color: "#d13438",
+                                                                        background: "transparent",
+                                                                        borderRadius: 3,
+                                                                        marginLeft: 4,
+                                                                        padding: 2,
+                                                                        height: 20,
+                                                                        width: 20,
+                                                                        minWidth: 20,
+                                                                        minHeight: 20,
+                                                                        lineHeight: "16px"
+                                                                    },
+                                                                    icon: {
+                                                                        fontSize: 12
+                                                                    }
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    if (window.confirm(`Are you sure you want to delete "${childItem.name}"?`)) {
+                                                                        navigationManager.deleteChildItem(parentIndex, childIndex);
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </>
                                                     )}
                                                 </div>
                                                 {/* Description below name, SharePoint style */}

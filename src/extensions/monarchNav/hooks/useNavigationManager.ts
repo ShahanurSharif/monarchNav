@@ -62,6 +62,12 @@ export interface INavigationManagerActions {
   getFormTitle: () => string;
   isChildForm: () => boolean;
   canAddChild: () => boolean;
+
+  // New: Delete child item
+  deleteChildItem: (parentIndex: number, childIndex: number) => void;
+
+  // New: Delete parent item
+  deleteParentItem: (parentIndex: number) => void;
 }
 
 /**
@@ -378,6 +384,33 @@ export const useNavigationManager = (
     return state.editingContext?.type === 'edit-parent';
   }, [state.editingContext]);
 
+  // New: Delete child item
+  const deleteChildItem = React.useCallback((parentIndex: number, childIndex: number): void => {
+    const newItems = [...items];
+    const parent = newItems[parentIndex];
+    if (
+      parent &&
+      Array.isArray(parent.children) &&
+      parent.children &&
+      parent.children.length > childIndex &&
+      parent.children[childIndex] !== undefined
+    ) {
+      parent.children = parent.children.filter((_, idx) => idx !== childIndex);
+      // If no children left, remove the children property
+      if (!parent.children || parent.children.length === 0) {
+        delete parent.children;
+      }
+      onItemsChange(newItems);
+    }
+  }, [items, onItemsChange]);
+
+  // New: Delete parent item
+  const deleteParentItem = React.useCallback((parentIndex: number): void => {
+    if (parentIndex < 0 || parentIndex >= items.length) return;
+    const newItems = items.filter((_, idx) => idx !== parentIndex);
+    onItemsChange(newItems);
+  }, [items, onItemsChange]);
+
   // Detect unsaved changes
   const hasUnsavedChanges = React.useMemo(() => {
     const { editingContext } = state;
@@ -431,6 +464,8 @@ export const useNavigationManager = (
     // Utility functions
     getFormTitle,
     isChildForm,
-    canAddChild
+    canAddChild,
+    deleteChildItem,
+    deleteParentItem // Add deleteParentItem to returned actions
   };
 };
