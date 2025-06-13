@@ -8,27 +8,29 @@
     "skipFeatureDeployment": false,
     "isDomainIsolated": false,
     "developer": {
-      "name": "",
-      "websiteUrl": "",
-      "privacyUrl": "",
-      "termsOfUseUrl": "",
-      "mpnId": "Undefined-1.21.1"
+      "name": "Shahanur Sharif (Shan)",
+      "websiteUrl": "https://www.monarch360.com.au/",
+      "privacyUrl": "https://www.monarch360.com.au/",
+      "termsOfUseUrl": "https://www.monarch360.com.au/",
+      "mpnId": "MONARCH360-2025"
     },
     "metadata": {
       "shortDescription": {
-        "default": "monarch-nav description"
+        "default": "MonarchNav: Modern, branded navigation for SharePoint Online."
       },
       "longDescription": {
-        "default": "monarch-nav description"
+        "default": "MonarchNav is a professionally branded SharePoint Framework (SPFx) Application Customizer that delivers a modern, customizable navigation bar for SharePoint Online. Features include logo branding, theme customization, hierarchical navigation, and a user-friendly configuration experience."
       },
-      "screenshotPaths": [],
+      "screenshotPaths": [
+        "assets/monarchNav.png"
+      ],
       "videoUrl": "",
-      "categories": []
+      "categories": ["Productivity", "Collaboration", "Site Design"]
     },
     "features": [
       {
-        "title": "Application Extension - Deployment of custom action",
-        "description": "Deploys a custom action with ClientSideComponentId association",
+        "title": "MonarchNav – Branded Navigation Extension",
+        "description": "Adds a modern, branded navigation bar with logo and theme customization to SharePoint Online.",
         "id": "7c7c26cf-e427-4095-afad-7fce1ca277fa",
         "version": "1.1.0.0",
         "assets": {
