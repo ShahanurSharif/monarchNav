@@ -2,8 +2,9 @@
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
     <ClientSideComponentInstance
         Title="MonarchNav"
+        Description="Modern branded navigation for SharePoint Online"
         Location="ClientSideExtension.ApplicationCustomizer"
         ComponentId="99e2cc8b-a0a9-4b8b-9cd3-b80abd2aef49"
-        Properties="{&quot;testMessage&quot;:&quot;Test message&quot;}">
+        Properties="{&quot;debugMode&quot;:false}">
     </ClientSideComponentInstance>
 </Elements>

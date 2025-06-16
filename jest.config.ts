@@ -6,7 +6,8 @@ module.exports = {
     '/node_modules/',
     '/lib/',
     '/dist/',
-    '/tests/.*\\.js$/'
+    '/tests/.*\\.js$/',
+    '/tests/e2e/'
   ],
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',

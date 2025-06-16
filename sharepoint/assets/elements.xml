@@ -1,24 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
-    <!-- Application Customizer Registration -->
     <CustomAction
         Title="MonarchNav"
+        Description="Modern branded navigation for SharePoint Online"
         Location="ClientSideExtension.ApplicationCustomizer"
         ClientSideComponentId="99e2cc8b-a0a9-4b8b-9cd3-b80abd2aef49"
-        ClientSideComponentProperties="{&quot;testMessage&quot;:&quot;Test message&quot;}">
+        ClientSideComponentProperties="{&quot;debugMode&quot;:false,&quot;testMode&quot;:false}">
     </CustomAction>
-    
-    <!-- Provision MonarchNav Configuration File and Default Logo -->
-    <Module Name="MonarchNavAssets" Url="SiteAssets" Path="assets">
-        <File Path="monarchNavConfig.json" Url="monarchNavConfig.json" Type="GhostableInLibrary">
-            <Property Name="Title" Value="MonarchNav Configuration" />
-            <Property Name="Description" Value="Configuration file for MonarchNav extension containing themes and navigation items" />
-            <Property Name="ContentType" Value="Document" />
-        </File>
-        <File Path="monarchNav.png" Url="monarchNav.png" Type="GhostableInLibrary">
-            <Property Name="Title" Value="MonarchNav Default Logo" />
-            <Property Name="Description" Value="Default logo for MonarchNav extension" />
-            <Property Name="ContentType" Value="Image" />
-        </File>
-    </Module>
 </Elements>

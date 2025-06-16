@@ -1,0 +1,118 @@
+# Page snapshot
+
+```yaml
+- textbox "Search"
+- heading "~ /" [level=1]:
+  - link "~":
+    - /url: /
+  - text: /
+- list:
+  - listitem:
+    - link "config 6/9/2025 11:56:23 PM":
+      - /url: /config
+  - listitem:
+    - link "dist 6/14/2025 1:15:01 AM":
+      - /url: /dist
+  - listitem:
+    - link "lib 6/14/2025 2:28:13 AM":
+      - /url: /lib
+  - listitem:
+    - link "node_modules 6/14/2025 2:48:27 AM":
+      - /url: /node_modules
+  - listitem:
+    - link "release 6/12/2025 2:09:00 AM":
+      - /url: /release
+  - listitem:
+    - link "sharepoint 6/11/2025 5:54:58 PM":
+      - /url: /sharepoint
+  - listitem:
+    - link "src 6/9/2025 11:56:23 PM":
+      - /url: /src
+  - listitem:
+    - link "temp 6/12/2025 2:09:00 AM":
+      - /url: /temp
+  - listitem:
+    - link "test-results 6/17/2025 12:37:05 AM":
+      - /url: /test-results
+  - listitem:
+    - link "tests 6/14/2025 4:22:54 PM":
+      - /url: /tests
+  - listitem:
+    - link "CHILD_ITEM_PERSISTENCE_FIX.md 8003 6/13/2025 5:37:45 AM":
+      - /url: /CHILD_ITEM_PERSISTENCE_FIX.md
+  - listitem:
+    - link "DEPLOYMENT_READY.md 0 6/12/2025 7:14:25 PM":
+      - /url: /DEPLOYMENT_READY.md
+  - listitem:
+    - link "DEPLOYMENT_TROUBLESHOOTING.md 5168 6/17/2025 12:35:37 AM":
+      - /url: /DEPLOYMENT_TROUBLESHOOTING.md
+  - listitem:
+    - link "gulpfile.js 407 6/9/2025 11:56:23 PM":
+      - /url: /gulpfile.js
+  - listitem:
+    - link "HARDCODED_HOME_FIX.md 4951 6/12/2025 3:26:14 AM":
+      - /url: /HARDCODED_HOME_FIX.md
+  - listitem:
+    - link "HOME_URL_IMPLEMENTATION.md 5240 6/12/2025 3:16:37 AM":
+      - /url: /HOME_URL_IMPLEMENTATION.md
+  - listitem:
+    - link "INSTRUCTION.md 2790 6/13/2025 6:16:01 AM":
+      - /url: /INSTRUCTION.md
+  - listitem:
+    - link "jest.config.js 0 6/16/2025 12:36:28 PM":
+      - /url: /jest.config.js
+  - listitem:
+    - link "jest.config.ts 704 6/17/2025 12:36:50 AM":
+      - /url: /jest.config.ts
+  - listitem:
+    - link "package-lock.json 1377769 6/14/2025 4:22:54 PM":
+      - /url: /package-lock.json
+  - listitem:
+    - link "package.json 1380 6/14/2025 4:22:54 PM":
+      - /url: /package.json
+  - listitem:
+    - link "PHASE2_COMPLETE.md 6100 6/12/2025 2:49:06 AM":
+      - /url: /PHASE2_COMPLETE.md
+  - listitem:
+    - link "PHASE2_TESTING.md 5709 6/12/2025 2:49:06 AM":
+      - /url: /PHASE2_TESTING.md
+  - listitem:
+    - link "PHASE3_DROPDOWN_MENUS_COMPLETE.md 6925 6/13/2025 12:55:21 AM":
+      - /url: /PHASE3_DROPDOWN_MENUS_COMPLETE.md
+  - listitem:
+    - link "PHASE3_HIERARCHICAL_COMPLETE.md 6152 6/13/2025 12:38:35 AM":
+      - /url: /PHASE3_HIERARCHICAL_COMPLETE.md
+  - listitem:
+    - link "PHASE4_CONSISTENT_SAVE_BEHAVIOR_COMPLETE.md 8439 6/13/2025 1:30:22 AM":
+      - /url: /PHASE4_CONSISTENT_SAVE_BEHAVIOR_COMPLETE.md
+  - listitem:
+    - link "playwright.config.ts 524 6/14/2025 4:22:54 PM":
+      - /url: /playwright.config.ts
+  - listitem:
+    - link "PROJECT_COMPLETE_ALL_PHASES.md 6842 6/13/2025 1:30:22 AM":
+      - /url: /PROJECT_COMPLETE_ALL_PHASES.md
+  - listitem:
+    - link "QUICK_DEPLOY.md 0 6/12/2025 7:14:27 PM":
+      - /url: /QUICK_DEPLOY.md
+  - listitem:
+    - link "README.md 2715 6/12/2025 2:40:19 AM":
+      - /url: /README.md
+  - listitem:
+    - link "RELEASE_NOTES_v1.0.0.md 973 6/14/2025 1:26:47 AM":
+      - /url: /RELEASE_NOTES_v1.0.0.md
+  - listitem:
+    - link "RELEASE_NOTES_v1.1.0.md 1266 6/14/2025 1:17:46 AM":
+      - /url: /RELEASE_NOTES_v1.1.0.md
+  - listitem:
+    - link "SAVE_CANCEL_RELOAD_IMPLEMENTATION.md 8052 6/12/2025 8:16:05 PM":
+      - /url: /SAVE_CANCEL_RELOAD_IMPLEMENTATION.md
+  - listitem:
+    - link "sync-version.js 1058 6/14/2025 12:46:37 AM":
+      - /url: /sync-version.js
+  - listitem:
+    - link "tsconfig.json 816 6/14/2025 4:22:54 PM":
+      - /url: /tsconfig.json
+  - listitem:
+    - link "UNSAVED_CHANGES_DIALOG_FIX_COMPLETE.md 4867 6/13/2025 1:51:32 AM":
+      - /url: /UNSAVED_CHANGES_DIALOG_FIX_COMPLETE.md
+```

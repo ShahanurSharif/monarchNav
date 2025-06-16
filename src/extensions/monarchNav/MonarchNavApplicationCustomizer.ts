@@ -18,8 +18,10 @@ const LOG_SOURCE: string = 'MonarchNavApplicationCustomizer';
  * You can define an interface to describe it.
  */
 export interface IMonarchNavApplicationCustomizerProperties {
-  // This is an example; replace with your own property
-  testMessage: string;
+  // Debug mode flag (optional)
+  debugMode?: boolean;
+  // Test message for compatibility
+  testMessage?: string;
 }
 
 /** A Custom Action which can be run during execution of a Client Side Application */
@@ -32,10 +34,35 @@ export default class MonarchNavApplicationCustomizer
     try {
       Log.info(LOG_SOURCE, "Initializing MonarchNav extension...");
       
-      // Load configuration from deployed file in SharePoint Site Assets
-      const config: IMonarchNavConfig = await MonarchNavConfigService.loadConfig(this.context);
+      let config: IMonarchNavConfig;
       
-      Log.info(LOG_SOURCE, `Configuration loaded: ${JSON.stringify(config.themes)}`);
+      try {
+        // Load configuration from deployed file in SharePoint Site Assets
+        config = await MonarchNavConfigService.loadConfig(this.context);
+        Log.info(LOG_SOURCE, `Configuration loaded successfully`);
+      } catch (configError) {
+        Log.warn(LOG_SOURCE, `Failed to load config, using default: ${configError}`);
+        // Use default configuration if loading fails
+        config = {
+          themes: {
+            backgroundColor: '#0078d4',
+            textColor: '#ffffff',
+            is_sp_header: false,
+            items_font_size: '14px',
+            logoUrl: '',
+            logoSize: '32px',
+            fontStyle: 'normal'
+          },
+          items: [
+            {
+              name: 'Home',
+              link: this.context.pageContext.web.absoluteUrl,
+              target: '_self' as const,
+              children: []
+            }
+          ]
+        };
+      }
       
       // Create React element with loaded configuration
       const element: React.ReactElement = React.createElement(
@@ -55,13 +82,40 @@ export default class MonarchNavApplicationCustomizer
         this._topPlaceholder = topPlaceholder;
         ReactDom.render(element, topPlaceholder.domElement);
         Log.info(LOG_SOURCE, "MonarchNav extension rendered successfully");
+      } else {
+        Log.error(LOG_SOURCE, new Error("Unable to create top placeholder for MonarchNav"));
       }
 
     } catch (error) {
-      Log.error(LOG_SOURCE, error as Error);
+      Log.error(LOG_SOURCE, new Error(`Critical error in MonarchNav initialization: ${error}`));
+      // Try to render a minimal fallback navigation
+      this._renderFallbackNavigation();
     }
 
     return Promise.resolve();
+  }
+
+  private _renderFallbackNavigation(): void {
+    try {
+      const topPlaceholder = this.context.placeholderProvider.tryCreateContent(
+        PlaceholderName.Top
+      );
+
+      if (topPlaceholder) {
+        this._topPlaceholder = topPlaceholder;
+        const fallbackElement = document.createElement('div');
+        fallbackElement.innerHTML = `
+          <div style="background-color: #0078d4; color: white; padding: 10px 20px; display: flex; align-items: center;">
+            <span style="font-weight: bold;">MonarchNav</span>
+            <span style="margin-left: auto; font-size: 12px;">Configuration loading...</span>
+          </div>
+        `;
+        topPlaceholder.domElement.appendChild(fallbackElement);
+        Log.info(LOG_SOURCE, "Fallback navigation rendered");
+      }
+    } catch (fallbackError) {
+      Log.error(LOG_SOURCE, new Error(`Failed to render fallback navigation: ${fallbackError}`));
+    }
   }
 
   public onDispose(): void {

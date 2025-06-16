@@ -1,0 +1,118 @@
+# Page snapshot
+
+```yaml
+- textbox "Search"
+- heading "~ /" [level=1]:
+  - link "~":
+    - /url: /
+  - text: /
+- list:
+  - listitem:
+    - link "config":
+      - /url: /config
+  - listitem:
+    - link "dist":
+      - /url: /dist
+  - listitem:
+    - link "lib":
+      - /url: /lib
+  - listitem:
+    - link "node_modules":
+      - /url: /node_modules
+  - listitem:
+    - link "release":
+      - /url: /release
+  - listitem:
+    - link "sharepoint":
+      - /url: /sharepoint
+  - listitem:
+    - link "src":
+      - /url: /src
+  - listitem:
+    - link "temp":
+      - /url: /temp
+  - listitem:
+    - link "test-results":
+      - /url: /test-results
+  - listitem:
+    - link "tests":
+      - /url: /tests
+  - listitem:
+    - link "CHILD_ITEM_PERSISTENCE_FIX.md":
+      - /url: /CHILD_ITEM_PERSISTENCE_FIX.md
+  - listitem:
+    - link "DEPLOYMENT_READY.md":
+      - /url: /DEPLOYMENT_READY.md
+  - listitem:
+    - link "DEPLOYMENT_TROUBLESHOOTING.md":
+      - /url: /DEPLOYMENT_TROUBLESHOOTING.md
+  - listitem:
+    - link "gulpfile.js":
+      - /url: /gulpfile.js
+  - listitem:
+    - link "HARDCODED_HOME_FIX.md":
+      - /url: /HARDCODED_HOME_FIX.md
+  - listitem:
+    - link "HOME_URL_IMPLEMENTATION.md":
+      - /url: /HOME_URL_IMPLEMENTATION.md
+  - listitem:
+    - link "INSTRUCTION.md":
+      - /url: /INSTRUCTION.md
+  - listitem:
+    - link "jest.config.js":
+      - /url: /jest.config.js
+  - listitem:
+    - link "jest.config.ts":
+      - /url: /jest.config.ts
+  - listitem:
+    - link "package-lock.json":
+      - /url: /package-lock.json
+  - listitem:
+    - link "package.json":
+      - /url: /package.json
+  - listitem:
+    - link "PHASE2_COMPLETE.md":
+      - /url: /PHASE2_COMPLETE.md
+  - listitem:
+    - link "PHASE2_TESTING.md":
+      - /url: /PHASE2_TESTING.md
+  - listitem:
+    - link "PHASE3_DROPDOWN_MENUS_COMPLETE.md":
+      - /url: /PHASE3_DROPDOWN_MENUS_COMPLETE.md
+  - listitem:
+    - link "PHASE3_HIERARCHICAL_COMPLETE.md":
+      - /url: /PHASE3_HIERARCHICAL_COMPLETE.md
+  - listitem:
+    - link "PHASE4_CONSISTENT_SAVE_BEHAVIOR_COMPLETE.md":
+      - /url: /PHASE4_CONSISTENT_SAVE_BEHAVIOR_COMPLETE.md
+  - listitem:
+    - link "playwright.config.ts":
+      - /url: /playwright.config.ts
+  - listitem:
+    - link "PROJECT_COMPLETE_ALL_PHASES.md":
+      - /url: /PROJECT_COMPLETE_ALL_PHASES.md
+  - listitem:
+    - link "QUICK_DEPLOY.md":
+      - /url: /QUICK_DEPLOY.md
+  - listitem:
+    - link "README.md":
+      - /url: /README.md
+  - listitem:
+    - link "RELEASE_NOTES_v1.0.0.md":
+      - /url: /RELEASE_NOTES_v1.0.0.md
+  - listitem:
+    - link "RELEASE_NOTES_v1.1.0.md":
+      - /url: /RELEASE_NOTES_v1.1.0.md
+  - listitem:
+    - link "SAVE_CANCEL_RELOAD_IMPLEMENTATION.md":
+      - /url: /SAVE_CANCEL_RELOAD_IMPLEMENTATION.md
+  - listitem:
+    - link "sync-version.js":
+      - /url: /sync-version.js
+  - listitem:
+    - link "tsconfig.json":
+      - /url: /tsconfig.json
+  - listitem:
+    - link "UNSAVED_CHANGES_DIALOG_FIX_COMPLETE.md":
+      - /url: /UNSAVED_CHANGES_DIALOG_FIX_COMPLETE.md
+```

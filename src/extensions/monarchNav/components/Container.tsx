@@ -208,7 +208,7 @@ const Container: React.FC<IContainerProps> = (props) => {
     }, [config.items, homeUrl]);
 
     return (
-        <div>
+        <div data-testid="monarch-nav-root">
             <div
                 id="monarchMainNavHeader"
                 style={{
