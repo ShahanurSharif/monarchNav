@@ -5,7 +5,7 @@
     "monarch-nav-application-customizer": {
       "components": [
         {
-          "entrypoint": "./lib/src/extensions/monarchNav/MonarchNavApplicationCustomizer.js",
+          "entrypoint": "./lib/extensions/monarchNav/MonarchNavApplicationCustomizer.js",
           "manifest": "./src/extensions/monarchNav/MonarchNavApplicationCustomizer.manifest.json"
         }
       ]
