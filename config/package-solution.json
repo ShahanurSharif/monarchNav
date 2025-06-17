@@ -1,14 +1,14 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "monarch-nav-client-side-solution", 
+    "name": "monarch-nav-theme", 
     "id": "4cd29abd-f439-4525-acca-f7849d4e3620",
-    "version": "1.1.0.4",
+    "version": "1.1.0.5",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
     "developer": {
-      "name": "Shahanur Sharif (Shan)",
+      "name": "Monarch Team",
       "websiteUrl": "https://www.monarch360.com.au/",
       "privacyUrl": "https://www.monarch360.com.au/",
       "termsOfUseUrl": "https://www.monarch360.com.au/",
@@ -32,17 +32,16 @@
         "title": "MonarchNav – Branded Navigation Extension",
         "description": "Adds a modern, branded navigation bar with logo and theme customization to SharePoint Online.",
         "id": "7c7c26cf-e427-4095-afad-7fce1ca277fa",
-        "version": "1.1.0.4",
+        "version": "1.1.0.5",
         "assets": {
           "elementManifests": [
-            "elements.xml",
-            "ClientSideInstance.xml"
+            "elements.xml"
           ]
         }
       }
     ]
   },
   "paths": {
-    "zippedPackage": "solution/monarch-nav.sppkg"
+    "zippedPackage": "solution/monarch-nav-theme.sppkg"
   }
 }

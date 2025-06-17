@@ -5,6 +5,6 @@
         Description="MonarchNav Application Customizer"
         Location="ClientSideExtension.ApplicationCustomizer"
         ComponentId="99e2cc8b-a0a9-4b8b-9cd3-b80abd2aef49"
-        Properties="{}">
+        Properties="{&quot;testMessage&quot;:&quot;Test message&quot;}">
     </ClientSideComponentInstance>
 </Elements>
