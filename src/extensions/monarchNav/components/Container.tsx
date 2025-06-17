@@ -115,7 +115,12 @@ const Container: React.FC<IContainerProps> = (props) => {
 
     // Helper function to apply SharePoint header visibility
     const applySpHeaderVisibility = React.useCallback((visible: boolean): void => {
-        const possibleIds = ['spSiteHeader', 'spHeader', 'SuiteNavWrapper'];
+        const possibleIds = [
+            'spSiteHeader', 
+            'spHeader', 
+            // 'SuiteNavWrapper'
+        ];
+        
         
         for (const id of possibleIds) {
             const spHeader = document.getElementById(id);
