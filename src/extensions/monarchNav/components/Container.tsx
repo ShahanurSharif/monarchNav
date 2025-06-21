@@ -1,6 +1,6 @@
 import * as React from "react";
 import { IContainerProps } from "./IContainerProps";
-import { IconButton, Callout, Toggle, ColorPicker } from "@fluentui/react";
+import { IconButton, Modal, Toggle, ColorPicker, Callout } from "@fluentui/react";
 import { useConfigManager } from "../hooks/useConfigManager";
 import { useNavigationManager } from "../hooks/useNavigationManager";
 import { MonarchNavConfigService } from "../MonarchNavConfigService";
@@ -16,6 +16,21 @@ const Container: React.FC<IContainerProps> = (props) => {
                 max-width: 591px !important;
                 width: 591px !important;
             }
+            
+            /* Theme Modal Two-Column Layout */
+            .theme-modal-two-column {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+            }
+            
+            @media (max-width: 800px) {
+                .theme-modal-two-column {
+                    grid-template-columns: 1fr;
+                    gap: 16px;
+                }
+            }
+            
             @media (max-width: 639px) {
                 .monarch-nav-dialog .ms-Modal-main {
                     max-width: 90vw !important;
@@ -79,9 +94,15 @@ const Container: React.FC<IContainerProps> = (props) => {
     // UI state
     const [isSettingsCalloutVisible, setIsSettingsCalloutVisible] = React.useState(false);
     const [isEditActionsVisible, setIsEditActionsVisible] = React.useState(false);
+    
+    // Color picker callout states
+    const [isBackgroundColorCalloutVisible, setIsBackgroundColorCalloutVisible] = React.useState(false);
+    const [isTextColorCalloutVisible, setIsTextColorCalloutVisible] = React.useState(false);
 
     const settingsButtonRef = React.useRef<HTMLButtonElement>(null);
     const navigationButtonRef = React.useRef<HTMLButtonElement>(null);
+    const backgroundColorButtonRef = React.useRef<HTMLButtonElement>(null);
+    const textColorButtonRef = React.useRef<HTMLButtonElement>(null);
 
     // State for dropdown menus
     const [dropdownStates, setDropdownStates] = React.useState<{[key: number]: boolean}>({});
@@ -294,148 +315,167 @@ const Container: React.FC<IContainerProps> = (props) => {
                     {isEditActionsVisible && (
                         <>
                             {isSettingsCalloutVisible && (
-                                <Callout
-                                    id="theme_callout"
-                                    target={settingsButtonRef.current}
+                                <Modal
+                                    isOpen={isSettingsCalloutVisible}
                                     onDismiss={() => setIsSettingsCalloutVisible(false)}
-                                    setInitialFocus
-                                    styles={{
-                                        root: {
-                                            maxWidth: 320,
-                                            padding: 16,
-                                            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                                        },
-                                    }}
+                                    isBlocking={false}
+                                    containerClassName="monarch-nav-dialog"
                                 >
-                                    {/* Loading/Error states */}
-                                    {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
-                                    {isLoading && <div style={{ color: '#0078d4', marginBottom: 8 }}>Loading...</div>}
-                                    
-                                    {/* SharePoint Header Toggle */}
-                                    <Toggle
-                                        label="Show SharePoint Header"
-                                        checked={config.themes.is_sp_header}
-                                        onChange={(_e, checked) => updateTheme('is_sp_header', !!checked)}
-                                    />
-                                    
-                                    {/* Background color picker */}
-                                    <div style={{ marginTop: 16 }}>
-                                        <div style={{ marginBottom: 4 }}>
-                                            Header Background Color
-                                        </div>
-                                        <ColorPicker
-                                            color={backgroundColor}
-                                            onChange={(_ev, colorObj: { str: string }) => 
-                                                updateTheme('backgroundColor', colorObj.str)
-                                            }
-                                            alphaType="none"
-                                            showPreview={true}
-                                        />
-                                    </div>
-                                    
-                                    {/* Font color picker */}
-                                    <div style={{ marginTop: 16 }}>
-                                        <div style={{ marginBottom: 4 }}>
-                                            Menu Items Font Color
-                                        </div>
-                                        <ColorPicker
-                                            color={textColor}
-                                            onChange={(_ev, colorObj: { str: string }) => 
-                                                updateTheme('textColor', colorObj.str)
-                                            }
-                                            alphaType="none"
-                                            showPreview={true}
-                                        />
-                                    </div>
-                                    
-                                    {/* Font size slider */}
-                                    <div style={{ marginTop: 16, padding: 15 }}>
-                                        <div style={{ marginBottom: 4 }}>
-                                            Menu Items Font Size
-                                        </div>
-                                        <input
-                                            type="range"
-                                            min={12}
-                                            max={32}
-                                            step={1}
-                                            value={fontSize}
-                                            onChange={e => updateTheme('items_font_size', `${e.target.value}px`)}
-                                            style={{ width: "100%" }}
-                                        />
-                                        <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
-                                            {fontSize}px
-                                        </div>
-                                    </div>
-                                    
-                                    {/* Logo Upload */}
-                                    <div style={{ marginTop: 16 }}>
-                                        <div style={{ marginBottom: 4 }}>Header Logo</div>
-                                        <img
-                                            src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
-                                            alt="Logo"
-                                            style={{
-                                                height: config.themes.logoSize || "40px",
-                                                width: "auto",
-                                                marginBottom: 8,
-                                                borderRadius: 4,
-                                                background: "#fff",
-                                                border: "1px solid #eee"
-                                            }}
-                                        />
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            style={{ marginBottom: 8 }}
-                                            onChange={async (e) => {
-                                                const file = e.target.files?.[0];
-                                                if (file) {
-                                                    const reader = new FileReader();
-                                                    reader.onload = (ev) => {
-                                                        updateTheme("logoUrl", ev.target?.result as string);
-                                                    };
-                                                    reader.readAsDataURL(file);
-                                                }
-                                            }}
-                                        />
-                                        {/* Logo Resize Slider */}
-                                        <div style={{ marginTop: 8, padding: 15 }}>
-                                            <div style={{ marginBottom: 4 }}>Logo Size</div>
-                                            <input
-                                                type="range"
-                                                min={24}
-                                                max={128}
-                                                value={config.themes.logoSize ? parseInt(config.themes.logoSize) : 40}
-                                                onChange={e => updateTheme("logoSize", `${e.target.value}px`)}
-                                                style={{ width: "100%" }}
-                                            />
-                                            <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
-                                                {config.themes.logoSize || "40px"}
+                                    <div style={{
+                                        padding: 24,
+                                        maxWidth: 600,
+                                        backgroundColor: 'white',
+                                        maxHeight: '90vh',
+                                        overflowY: 'auto'
+                                    }}>
+                                        <h2 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 600 }}>
+                                            Theme Settings
+                                        </h2>
+                                        
+                                        {/* Loading/Error states */}
+                                        {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
+                                        {isLoading && <div style={{ color: '#0078d4', marginBottom: 8 }}>Loading...</div>}
+                                        
+                                        {/* First Row: Header Background Color | Menu Items Font Color */}
+                                        <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
+                                            <div>
+                                                <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 500 }}>Header Background Color</div>
+                                                <button
+                                                    ref={backgroundColorButtonRef}
+                                                    onClick={() => setIsBackgroundColorCalloutVisible(!isBackgroundColorCalloutVisible)}
+                                                    style={{
+                                                        width: 32,
+                                                        height: 32,
+                                                        borderRadius: '50%',
+                                                        backgroundColor: backgroundColor,
+                                                        border: '2px solid #ccc',
+                                                        cursor: 'pointer',
+                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                    }}
+                                                    title={`Current color: ${backgroundColor}`}
+                                                />
+                                            </div>
+                                            <div>
+                                                <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 500 }}>Menu Items Font Color</div>
+                                                <button
+                                                    ref={textColorButtonRef}
+                                                    onClick={() => setIsTextColorCalloutVisible(!isTextColorCalloutVisible)}
+                                                    style={{
+                                                        width: 32,
+                                                        height: 32,
+                                                        borderRadius: '50%',
+                                                        backgroundColor: textColor,
+                                                        border: '2px solid #ccc',
+                                                        cursor: 'pointer',
+                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                    }}
+                                                    title={`Current color: ${textColor}`}
+                                                />
                                             </div>
                                         </div>
-                                    </div>
-
-                                    {/* Font Style Dropdown */}
-                                    <div style={{ marginTop: 16, padding: 15 }}>
-                                        <div style={{ marginBottom: 4 }}>Menu Font Style</div>
-                                        <select
-                                            value={config.themes.fontStyle || "normal"}
-                                            onChange={e => updateTheme("fontStyle", e.target.value)}
-                                            style={{ width: "100%", padding: "6px", borderRadius: 2 }}
-                                        >
-                                            <option value="normal">Normal</option>
-                                            <option value="bold">Bold</option>
-                                            <option value="italic">Italic</option>
-                                        </select>
-                                    </div>
-                                    
-                                    {/* Action buttons */}
+                                        
+                                        {/* Second Row: Header Logo | Menu Items Font Size */}
+                                        <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
+                                            <div>
+                                                <div style={{ marginBottom: 4 }}>Header Logo</div>
+                                                <img
+                                                    src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
+                                                    alt="Logo"
+                                                    style={{
+                                                        height: config.themes.logoSize || "40px",
+                                                        width: "auto",
+                                                        marginBottom: 8,
+                                                        borderRadius: 4,
+                                                        background: "#fff",
+                                                        border: "1px solid #eee"
+                                                    }}
+                                                />
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    style={{ width: "100%" }}
+                                                    onChange={async (e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            const reader = new FileReader();
+                                                            reader.onload = (ev) => {
+                                                                updateTheme("logoUrl", ev.target?.result as string);
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <div style={{ marginBottom: 4 }}>Menu Items Font Size</div>
+                                                <input
+                                                    type="range"
+                                                    min={12}
+                                                    max={32}
+                                                    step={1}
+                                                    value={fontSize}
+                                                    onChange={e => updateTheme('items_font_size', `${e.target.value}px`)}
+                                                    style={{ width: "100%" }}
+                                                />
+                                                <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
+                                                    {fontSize}px
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Third Row: Logo Size | Menu Font Style */}
+                                        <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
+                                            <div>
+                                                <div style={{ marginBottom: 4 }}>Logo Size</div>
+                                                <input
+                                                    type="range"
+                                                    min={24}
+                                                    max={128}
+                                                    value={config.themes.logoSize ? parseInt(config.themes.logoSize) : 40}
+                                                    onChange={e => updateTheme("logoSize", `${e.target.value}px`)}
+                                                    style={{ width: "100%" }}
+                                                />
+                                                <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
+                                                    {config.themes.logoSize || "40px"}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style={{ marginBottom: 4 }}>Menu Font Style</div>
+                                                <select
+                                                    value={config.themes.fontStyle || "normal"}
+                                                    onChange={e => updateTheme("fontStyle", e.target.value)}
+                                                    style={{ width: "100%", padding: "6px", borderRadius: 2 }}
+                                                >
+                                                    <option value="normal">Normal</option>
+                                                    <option value="bold">Bold</option>
+                                                    <option value="italic">Italic</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                    {/* Action buttons with SharePoint Header toggle */}
                                     <div style={{ 
                                         marginTop: 20, 
                                         display: "flex", 
-                                        gap: 8, 
-                                        padding: "0 15px",
-                                        justifyContent: "flex-end" 
+                                        gap: 12, 
+                                        padding: "0",
+                                        justifyContent: "space-between",
+                                        alignItems: "center"
                                     }}>
+                                        {/* Left side: SharePoint Header toggle */}
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <span style={{ fontSize: 14 }}>Show SharePoint Header</span>
+                                            <Toggle
+                                                checked={config.themes.is_sp_header}
+                                                onChange={(_e, checked) => updateTheme('is_sp_header', !!checked)}
+                                                styles={{
+                                                    root: { marginBottom: 0 }
+                                                }}
+                                            />
+                                        </div>
+                                        
+                                        {/* Right side: Action buttons */}
+                                        <div style={{ display: "flex", gap: 8 }}>
                                         <button
                                             style={{
                                                 backgroundColor: "#f3f2f1",
@@ -482,7 +522,57 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         >
                                             {isSaving ? "Saving..." : "Save"}
                                         </button>
+                                        </div>
                                     </div>
+                                    </div>
+                                </Modal>
+                            )}
+                            
+                            {/* Background Color Picker Callout */}
+                            {isBackgroundColorCalloutVisible && (
+                                <Callout
+                                    target={backgroundColorButtonRef.current}
+                                    onDismiss={() => setIsBackgroundColorCalloutVisible(false)}
+                                    styles={{
+                                        root: {
+                                            padding: 16,
+                                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                                        },
+                                    }}
+                                >
+                                    <div style={{ marginBottom: 8, fontWeight: 500 }}>Header Background Color</div>
+                                    <ColorPicker
+                                        color={backgroundColor}
+                                        onChange={(_ev, colorObj: { str: string }) => 
+                                            updateTheme('backgroundColor', colorObj.str)
+                                        }
+                                        alphaType="none"
+                                        showPreview={true}
+                                    />
+                                </Callout>
+                            )}
+                            
+                            {/* Text Color Picker Callout */}
+                            {isTextColorCalloutVisible && (
+                                <Callout
+                                    target={textColorButtonRef.current}
+                                    onDismiss={() => setIsTextColorCalloutVisible(false)}
+                                    styles={{
+                                        root: {
+                                            padding: 16,
+                                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                                        },
+                                    }}
+                                >
+                                    <div style={{ marginBottom: 8, fontWeight: 500 }}>Menu Items Font Color</div>
+                                    <ColorPicker
+                                        color={textColor}
+                                        onChange={(_ev, colorObj: { str: string }) => 
+                                            updateTheme('textColor', colorObj.str)
+                                        }
+                                        alphaType="none"
+                                        showPreview={true}
+                                    />
                                 </Callout>
                             )}
                         </>
@@ -802,22 +892,21 @@ const Container: React.FC<IContainerProps> = (props) => {
                 {/* right side empty for now */}
                 <div />
             </div>
-            {/* Restore Navigation Add/Edit Callout */}
+            {/* Restore Navigation Add/Edit Modal */}
             {navigationManager.isCalloutVisible && (
-              <Callout
-                id="navigation_callout"
-                target={navigationButtonRef.current}
+              <Modal
+                isOpen={navigationManager.isCalloutVisible}
                 onDismiss={navigationManager.cancelEdit}
-                setInitialFocus
-                styles={{
-                  root: {
-                    maxWidth: 400,
-                    padding: 0,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                    zIndex: 2000
-                  }
-                }}
+                isBlocking={false}
+                containerClassName="monarch-nav-dialog"
               >
+                <div style={{
+                  backgroundColor: 'white',
+                  maxHeight: '90vh',
+                  overflowY: 'auto',
+                  maxWidth: 500,
+                  width: '100%'
+                }}>
                 <NavigationItemForm
                   formData={navigationManager.formData}
                   validationErrors={navigationManager.validationErrors}
@@ -841,7 +930,8 @@ const Container: React.FC<IContainerProps> = (props) => {
                     }
                   }}
                 />
-              </Callout>
+                </div>
+              </Modal>
             )}
         </div>
     );
