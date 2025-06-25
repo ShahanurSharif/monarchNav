@@ -35,7 +35,7 @@ const FALLBACK_CONFIG: IMonarchNavConfig = {
     items_font_size: "18px",
     logoUrl: "/SiteAssets/MonarchNav.png",
     logoSize: "40px",
-    padding_top_bottom: "20px",
+    padding_top_bottom: "12px",
     fontStyle: "normal"
   },
   items: [

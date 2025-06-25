@@ -57,6 +57,17 @@ export const useConfigManager = (
         if (isNaN(fontSize) || fontSize < 8 || fontSize > 48) {
             errors.push('Font size must be between 8px and 48px');
         }
+
+        // Validate padding_top_bottom
+        const padding = configToValidate.themes.padding_top_bottom;
+        if (!padding || typeof padding !== 'string' || !/^\d{1,2}px$/.test(padding)) {
+            errors.push('Top & Bottom Padding must be a string in the format "0px" to "64px"');
+        } else {
+            const value = parseInt(padding.replace('px', ''));
+            if (isNaN(value) || value < 0 || value > 64) {
+                errors.push('Top & Bottom Padding must be between 0px and 64px');
+            }
+        }
         
         return errors;
     }, []);

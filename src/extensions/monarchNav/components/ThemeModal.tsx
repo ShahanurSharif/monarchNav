@@ -188,7 +188,7 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                             <div style={{ marginBottom: 4 }}>Top & Bottom Padding</div>
                             <input
                                 type="range"
-                                min={12}
+                                min={8}
                                 max={32}
                                 step={1}
                                 value={config.themes.padding_top_bottom ? parseInt(config.themes.padding_top_bottom) : 0}
