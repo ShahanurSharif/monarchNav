@@ -181,7 +181,29 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                             </select>
                         </div>
                     </div>
-                    
+
+                    {/* Fourth Row: Top & Bottom Padding | Menu Font Style */}
+                    <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
+                        <div>
+                            <div style={{ marginBottom: 4 }}>Top & Bottom Padding</div>
+                            <input
+                                type="range"
+                                min={12}
+                                max={32}
+                                step={1}
+                                value={config.themes.padding_top_bottom ? parseInt(config.themes.padding_top_bottom) : 0}
+                                onChange={e => updateTheme('padding_top_bottom', `${e.target.value}px`)}
+                                style={{ width: "100%" }}
+                            />
+                            <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
+                                {config.themes.padding_top_bottom || "0px"}
+                            </div>
+                        </div>
+                        <div>
+                            
+                        </div>
+                    </div>
+
                     {/* Action buttons with SharePoint Header toggle */}
                     <div style={{ 
                         marginTop: 20, 
@@ -193,7 +215,7 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                     }}>
                         {/* Left side: SharePoint Header toggle */}
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontSize: 14 }}>Show SharePoint Header</span>
+                            <span style={{ fontSize: 14 }}>{config.themes.is_sp_header ? 'Hide' : 'Show'} SharePoint Header</span>
                             <Toggle
                                 checked={config.themes.is_sp_header}
                                 onChange={(_e, checked) => updateTheme('is_sp_header', !!checked)}

@@ -210,6 +210,7 @@ const Container: React.FC<IContainerProps> = (props) => {
     // Extract values from config for easier access
     const backgroundColor = config.themes.backgroundColor;
     const textColor = config.themes.textColor;
+    const padding_top_bottom = config.themes.padding_top_bottom;
     const fontSize = parseInt(config.themes.items_font_size.replace('px', ''));
     const fontStyle = config.themes.fontStyle || "normal";
     const homeUrl = props.context.pageContext.web.absoluteUrl;
@@ -235,7 +236,10 @@ const Container: React.FC<IContainerProps> = (props) => {
                 style={{
                     backgroundColor: backgroundColor,
                     color: textColor,
-                    padding: "12px 20px",
+                    paddingTop: padding_top_bottom ? parseInt(padding_top_bottom) : 0,
+                    paddingBottom: padding_top_bottom ? parseInt(padding_top_bottom) : 0,
+                    paddingLeft: 12,
+                    paddingRight: 12,
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -265,7 +269,10 @@ const Container: React.FC<IContainerProps> = (props) => {
                                     color: textColor,
                                     fontSize: 18,
                                     cursor: "pointer",
-                                    padding: "8px 8px",
+                                    paddingTop: padding_top_bottom ? parseInt(padding_top_bottom) : 8,
+                                    paddingBottom: padding_top_bottom ? parseInt(padding_top_bottom) : 8,
+                                    paddingLeft: 12,
+                                    paddingRight: 12,
                                     borderRadius: 4,
                                     transition: "background-color 0.2s ease",
                                 }}

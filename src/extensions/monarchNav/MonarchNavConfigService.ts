@@ -20,6 +20,7 @@ export interface IMonarchNavConfig {
     items_font_size: string;
     logoUrl: string;
     logoSize: string;
+    padding_top_bottom: string;
     fontStyle: string;
   };
   items: IMonarchNavItem[];
@@ -34,6 +35,7 @@ const FALLBACK_CONFIG: IMonarchNavConfig = {
     items_font_size: "18px",
     logoUrl: "/SiteAssets/MonarchNav.png",
     logoSize: "40px",
+    padding_top_bottom: "20px",
     fontStyle: "normal"
   },
   items: [
