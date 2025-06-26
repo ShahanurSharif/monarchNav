@@ -14,7 +14,7 @@ const Container: React.FC<IContainerProps> = (props) => {
 
     // Check screen size and update mobile state
     React.useEffect(() => {
-        const checkMobile = () => {
+        const checkMobile = (): void => {
             setIsMobile(window.innerWidth <= 768);
             if (window.innerWidth > 768) {
                 setIsMobileMenuOpen(false);
