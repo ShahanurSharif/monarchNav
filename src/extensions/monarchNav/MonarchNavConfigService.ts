@@ -17,6 +17,9 @@ export interface IMonarchNavConfig {
     backgroundColor: string;
     textColor: string;
     is_sp_header: boolean;
+    is_suite_nav: boolean;
+    is_command_bar: boolean;
+    is_app_bar: boolean;
     items_font_size: string;
     logoUrl: string;
     logoSize: string;
@@ -29,9 +32,12 @@ export interface IMonarchNavConfig {
 // Fallback configuration (only used if deployment file is missing/corrupted)
 const FALLBACK_CONFIG: IMonarchNavConfig = {
   themes: {
-    backgroundColor: "#0078d4",
-    textColor: "#ffffff",
+    backgroundColor: "#ffffff",
+    textColor: "#6c757d",
     is_sp_header: true,
+    is_suite_nav: true,
+    is_command_bar: true,
+    is_app_bar: true,
     items_font_size: "18px",
     logoUrl: "/SiteAssets/MonarchNav.png",
     logoSize: "40px",

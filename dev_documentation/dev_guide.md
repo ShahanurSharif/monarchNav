@@ -18,10 +18,13 @@ MonarchNav is a SharePoint Framework (SPFx) Application Customizer that provides
 
 ### Key Features
 - Custom branded navigation header
-- Hierarchical navigation with dropdown menus
+- Hierarchical navigation with professional dropdown menus
+- Mobile responsive design with hamburger menu
 - Theme customization (colors, fonts, logo)
+- SharePoint element visibility toggles (Header, Suite Nav, Command Bar, App Bar)
 - Auto-save functionality
-- Responsive design
+- Modern Fluent UI components and styling
+- Professional button and icon designs
 - Modal-based configuration UI
 
 ### Technology Stack
@@ -414,6 +417,106 @@ export const MyComponent: React.FC<IMyComponentProps> = (props) => {
     </div>
   );
 };
+```
+
+## Mobile Responsiveness
+
+MonarchNav features a fully responsive design that adapts to different screen sizes:
+
+### Responsive Breakpoints
+- **Desktop (>768px)**: Full navigation with horizontal layout and hover dropdowns
+- **Mobile (≤768px)**: Hamburger menu with slide-out navigation panel
+
+### Mobile Features
+- Touch-friendly navigation with large tap targets
+- Slide-out menu panel from the right side
+- Collapsible parent items with visual indicators
+- Mobile-optimized edit mode controls
+- Smooth animations and transitions
+
+### Implementation Details
+```typescript
+// Mobile state management
+const [isMobile, setIsMobile] = useState(false);
+const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+// Responsive detection
+React.useEffect(() => {
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth <= 768);
+    if (window.innerWidth > 768) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  return () => window.removeEventListener('resize', checkMobile);
+}, []);
+```
+
+## SharePoint Element Control
+
+MonarchNav provides granular control over SharePoint's native UI elements:
+
+### Available Toggles
+- **Default Header**: Controls `spSiteHeader`, `spHeader` elements
+- **Suite Navigation**: Controls `SuiteNavWrapper` element  
+- **Command Bar**: Controls `spCommandBar` element
+- **App Bar**: Controls `sp-appBar` element
+
+### Configuration Structure
+```typescript
+interface IMonarchNavConfig {
+  themes: {
+    is_sp_header: boolean;     // Default Header toggle
+    is_suite_nav: boolean;     // Suite Navigation toggle
+    is_command_bar: boolean;   // Command Bar toggle
+    is_app_bar: boolean;       // App Bar toggle
+    // ... other theme properties
+  };
+}
+```
+
+### CSS Implementation
+```typescript
+// Dynamic element hiding based on configuration
+const applyElementVisibility = (elementId: string, visible: boolean) => {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.display = visible ? "" : "none";
+  }
+};
+```
+
+## Professional UI Components
+
+### Modern Button Design
+All buttons now use consistent professional styling:
+- Fluent UI DefaultButton and IconButton components
+- Consistent sizing and spacing
+- Professional hover effects and transitions
+- Clean typography and color schemes
+
+### Enhanced Dropdown Menus
+- White background with sophisticated shadows
+- Improved spacing and Typography
+- Right-aligned action buttons
+- Smooth animations and micro-interactions
+- Professional color palette
+
+### Button Implementation Pattern
+```typescript
+<DefaultButton
+  text="Button Text"
+  iconProps={{ iconName: "Icon" }}
+  styles={{
+    root: {
+      // Professional styling
+    }
+  }}
+  onClick={handleClick}
+/>
 ```
 
 ## Testing

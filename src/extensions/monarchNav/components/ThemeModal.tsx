@@ -204,28 +204,73 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                         </div>
                     </div>
 
-                    {/* Action buttons with SharePoint Header toggle */}
+                    {/* SharePoint Element Visibility Toggles */}
+                    <div style={{ marginTop: 20, marginBottom: 20 }}>
+                        <h3 style={{ margin: '0 0 16px 0', fontSize: 16, fontWeight: 600 }}>
+                            SharePoint Element Visibility
+                        </h3>
+                        
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                            {/* Default Header Toggle */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ fontSize: 14 }}>{config.themes.is_sp_header ? 'Hide' : 'Show'} Default Header</span>
+                                <Toggle
+                                    checked={config.themes.is_sp_header}
+                                    onChange={(_e, checked) => updateTheme('is_sp_header', !!checked)}
+                                    styles={{
+                                        root: { marginBottom: 0 }
+                                    }}
+                                />
+                            </div>
+
+                            {/* Suite Navigation Toggle */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ fontSize: 14 }}>{config.themes.is_suite_nav ? 'Hide' : 'Show'} Suite Navigation</span>
+                                <Toggle
+                                    checked={config.themes.is_suite_nav}
+                                    onChange={(_e, checked) => updateTheme('is_suite_nav', !!checked)}
+                                    styles={{
+                                        root: { marginBottom: 0 }
+                                    }}
+                                />
+                            </div>
+
+                            {/* Command Bar Toggle */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ fontSize: 14 }}>{config.themes.is_command_bar ? 'Hide' : 'Show'} Command Bar</span>
+                                <Toggle
+                                    checked={config.themes.is_command_bar}
+                                    onChange={(_e, checked) => updateTheme('is_command_bar', !!checked)}
+                                    styles={{
+                                        root: { marginBottom: 0 }
+                                    }}
+                                />
+                            </div>
+
+                            {/* App Bar Toggle */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ fontSize: 14 }}>{config.themes.is_app_bar ? 'Hide' : 'Show'} App Bar</span>
+                                <Toggle
+                                    checked={config.themes.is_app_bar}
+                                    onChange={(_e, checked) => updateTheme('is_app_bar', !!checked)}
+                                    styles={{
+                                        root: { marginBottom: 0 }
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action buttons */}
                     <div style={{ 
                         marginTop: 20, 
                         display: "flex", 
                         gap: 12, 
                         padding: "0",
-                        justifyContent: "space-between",
+                        justifyContent: "flex-end",
                         alignItems: "center"
                     }}>
-                        {/* Left side: SharePoint Header toggle */}
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontSize: 14 }}>{config.themes.is_sp_header ? 'Hide' : 'Show'} SharePoint Header</span>
-                            <Toggle
-                                checked={config.themes.is_sp_header}
-                                onChange={(_e, checked) => updateTheme('is_sp_header', !!checked)}
-                                styles={{
-                                    root: { marginBottom: 0 }
-                                }}
-                            />
-                        </div>
-                        
-                        {/* Right side: Action buttons */}
+                        {/* Action buttons */}
                         <div style={{ display: "flex", gap: 8 }}>
                             <button
                                 style={{
