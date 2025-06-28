@@ -1,0 +1,49 @@
+{
+    "themes": {
+        "backgroundColor": "#ffffff",
+        "textColor": "#6c757d",
+        "is_sp_header": true,
+        "is_suite_nav": true,
+        "is_command_bar": true,
+        "is_app_bar": true,
+        "items_font_size": "18px",
+        "padding_top_bottom": "20px",
+        "logoUrl": "",
+        "logoSize": "40px",
+        "fontStyle": "normal"
+    },
+    "items": [
+        {
+            "name": "Home",
+            "link": "",
+            "target": "_self",
+            "description": "Navigate to site home page"
+        },
+        {
+            "name": "Documents",
+            "link": "/Shared Documents",
+            "target": "_self",
+            "description": "Site documents library",
+            "children": [
+                {
+                    "name": "Policies",
+                    "link": "/Shared Documents/Policies",
+                    "target": "_self",
+                    "description": "Company policies and procedures"
+                },
+                {
+                    "name": "Templates", 
+                    "link": "/Shared Documents/Templates",
+                    "target": "_self",
+                    "description": "Document templates"
+                }
+            ]
+        },
+        {
+            "name": "Lists", 
+            "link": "/Lists",
+            "target": "_self",
+            "description": "Site lists"
+        }
+    ]
+}
