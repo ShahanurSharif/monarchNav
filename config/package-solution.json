@@ -25,7 +25,11 @@
         "assets/monarchNav.png"
       ],
       "videoUrl": "",
-      "categories": ["Productivity", "Collaboration", "Site Design"]
+      "categories": [
+        "Productivity",
+        "Collaboration",
+        "Site Design"
+      ]
     },
     "features": [
       {
@@ -37,6 +41,9 @@
           "elementManifests": [
             "elements.xml",
             "ClientSideInstance.xml"
+          ],
+          "elementFiles": [
+            "monarchNavConfig.json"
           ]
         }
       }
