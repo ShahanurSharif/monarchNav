@@ -1,8 +1,8 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "monarch-nav-theme",
-    "id": "4cd29abd-f439-4525-acca-f7849d4e3620",
+    "name": "monarch-nav-v2",
+    "id": "2b91ae2f-6705-42d4-80aa-f88af14052eb",
     "version": "2.1.5.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
@@ -29,9 +29,9 @@
     },
     "features": [
       {
-        "title": "MonarchNav – Branded Navigation Extension",
+        "title": "MonarchNav v2 – Branded Navigation Extension",
         "description": "Adds a modern, branded navigation bar with logo and theme customization to SharePoint Online.",
-        "id": "7c7c26cf-e427-4095-afad-7fce1ca277fa",
+        "id": "b9428f83-1906-4bb7-b69f-907ce9af8370",
         "version": "1.1.0.9",
         "assets": {
           "elementManifests": [
@@ -43,6 +43,6 @@
     ]
   },
   "paths": {
-    "zippedPackage": "solution/monarch-nav-theme.sppkg"
+    "zippedPackage": "solution/monarch-nav-v2.sppkg"
   }
 }

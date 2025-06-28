@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
     <ClientSideComponentInstance
-        Title="MonarchNavTheme"
+        Title="MonarchNav v2"
+        Description="MonarchNav v2 Application Customizer"
         Location="ClientSideExtension.ApplicationCustomizer"
-        ComponentId="99e2cc8b-a0a9-4b8b-9cd3-b80abd2aef49"
+        ComponentId="05924f11-b2a5-4540-a70f-53af0227faeb"
         Properties="{&quot;testMessage&quot;:&quot;Test message&quot;}">
     </ClientSideComponentInstance>
 </Elements>
