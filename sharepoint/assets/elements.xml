@@ -6,8 +6,8 @@
         ClientSideComponentId="99e2cc8b-a0a9-4b8b-9cd3-b80abd2aef49"
         ClientSideComponentProperties="{&quot;testMessage&quot;:&quot;Test message&quot;}">
     </CustomAction>
-    <Module Name="MonarchNavAssets" Url="SiteAssets" Path="assets">
-        <File Path="monarchNavConfig.json" Url="monarchNavConfig.json" Type="GhostableInLibrary">
+    <Module  Name="MonarchNavAssets" Url="SiteAssets" Path="assets">
+        <File Path="monarch_nav_config.json" Url="monarch_nav_config.json" Type="GhostableInLibrary">
             <Property Name="Title" Value="MonarchNav Configuration" />
             <Property Name="Description" Value="Configuration file for MonarchNav extension containing themes and navigation items" />
             <Property Name="ContentType" Value="Document" />

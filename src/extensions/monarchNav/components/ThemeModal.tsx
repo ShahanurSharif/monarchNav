@@ -52,7 +52,7 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
             >
                 <div style={{
                     padding: 24,
-                    maxWidth: 600,
+                    maxWidth: 500,
                     backgroundColor: 'white',
                     maxHeight: '90vh',
                     overflowY: 'auto'
@@ -65,199 +65,178 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                     {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
                     {isLoading && <div style={{ color: '#0078d4', marginBottom: 8 }}>Loading...</div>}
                     
-                    {/* First Row: Header Background Color | Menu Items Font Color */}
-                    <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
-                        <div>
-                            <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 500 }}>Header Background Color</div>
-                            <button
-                                ref={backgroundColorButtonRef}
-                                onClick={() => setIsBackgroundColorCalloutVisible(!isBackgroundColorCalloutVisible)}
-                                style={{
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: '50%',
-                                    backgroundColor: backgroundColor,
-                                    border: '2px solid #ccc',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                }}
-                                title={`Current color: ${backgroundColor}`}
-                            />
-                        </div>
-                        <div>
-                            <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 500 }}>Menu Items Font Color</div>
-                            <button
-                                ref={textColorButtonRef}
-                                onClick={() => setIsTextColorCalloutVisible(!isTextColorCalloutVisible)}
-                                style={{
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: '50%',
-                                    backgroundColor: textColor,
-                                    border: '2px solid #ccc',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                }}
-                                title={`Current color: ${textColor}`}
-                            />
+                    {/* Header Background Color */}
+                    <div style={{ marginBottom: 16 }}>
+                        <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 500 }}>Header Background Color</div>
+                        <button
+                            ref={backgroundColorButtonRef}
+                            onClick={() => setIsBackgroundColorCalloutVisible(!isBackgroundColorCalloutVisible)}
+                            style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '50%',
+                                backgroundColor: backgroundColor,
+                                border: '2px solid #ccc',
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            }}
+                            title={`Current color: ${backgroundColor}`}
+                        />
+                    </div>
+                    
+                    {/* Menu Items Font Color */}
+                    <div style={{ marginBottom: 16 }}>
+                        <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 500 }}>Menu Items Font Color</div>
+                        <button
+                            ref={textColorButtonRef}
+                            onClick={() => setIsTextColorCalloutVisible(!isTextColorCalloutVisible)}
+                            style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '50%',
+                                backgroundColor: textColor,
+                                border: '2px solid #ccc',
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            }}
+                            title={`Current color: ${textColor}`}
+                        />
+                    </div>
+                    
+                    {/* Header Logo */}
+                    <div style={{ marginBottom: 16 }}>
+                        <div style={{ marginBottom: 4 }}>Header Logo</div>
+                        <img
+                            src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
+                            alt="Logo"
+                            style={{
+                                height: config.themes.logoSize || "40px",
+                                width: "auto",
+                                marginBottom: 8,
+                                borderRadius: 4,
+                                background: "#fff",
+                                border: "1px solid #eee"
+                            }}
+                        />
+                        <input
+                            type="file"
+                            accept="image/*"
+                            style={{ marginBottom: 8, width: "100%" }}
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = (ev) => {
+                                        updateTheme("logoUrl", ev.target?.result as string);
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            }}
+                        />
+                    </div>
+                    
+                    {/* Menu Items Font Size */}
+                    <div style={{ marginBottom: 16 }}>
+                        <div style={{ marginBottom: 4 }}>Menu Items Font Size</div>
+                        <input
+                            type="range"
+                            min={12}
+                            max={32}
+                            step={1}
+                            value={fontSize}
+                            onChange={e => updateTheme('items_font_size', `${e.target.value}px`)}
+                            style={{ width: "100%" }}
+                        />
+                        <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
+                            {fontSize}px
                         </div>
                     </div>
                     
-                    {/* Second Row: Header Logo | Menu Items Font Size */}
-                    <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
-                        <div>
-                            <div style={{ marginBottom: 4 }}>Header Logo</div>
-                            <img
-                                src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
-                                alt="Logo"
-                                style={{
-                                    height: config.themes.logoSize || "40px",
-                                    width: "auto",
-                                    marginBottom: 8,
-                                    borderRadius: 4,
-                                    background: "#fff",
-                                    border: "1px solid #eee"
-                                }}
-                            />
-                            <input
-                                type="file"
-                                accept="image/*"
-                                style={{ marginBottom: 8, width: "100%" }}
-                                onChange={async (e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                        const reader = new FileReader();
-                                        reader.onload = (ev) => {
-                                            updateTheme("logoUrl", ev.target?.result as string);
-                                        };
-                                        reader.readAsDataURL(file);
-                                    }
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <div style={{ marginBottom: 4 }}>Menu Items Font Size</div>
-                            <input
-                                type="range"
-                                min={12}
-                                max={32}
-                                step={1}
-                                value={fontSize}
-                                onChange={e => updateTheme('items_font_size', `${e.target.value}px`)}
-                                style={{ width: "100%" }}
-                            />
-                            <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
-                                {fontSize}px
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Third Row: Logo Size | Menu Font Style */}
-                    <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
-                        <div>
-                            <div style={{ marginBottom: 4 }}>Logo Size</div>
-                            <input
-                                type="range"
-                                min={24}
-                                max={128}
-                                value={config.themes.logoSize ? parseInt(config.themes.logoSize) : 40}
-                                onChange={e => updateTheme("logoSize", `${e.target.value}px`)}
-                                style={{ width: "100%" }}
-                            />
-                            <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
-                                {config.themes.logoSize || "40px"}
-                            </div>
-                        </div>
-                        <div>
-                            <div style={{ marginBottom: 4 }}>Menu Font Style</div>
-                            <select
-                                value={config.themes.fontStyle || "normal"}
-                                onChange={e => updateTheme("fontStyle", e.target.value)}
-                                style={{ width: "100%", padding: "6px", borderRadius: 2 }}
-                            >
-                                <option value="normal">Normal</option>
-                                <option value="bold">Bold</option>
-                                <option value="italic">Italic</option>
-                            </select>
+                    {/* Logo Size */}
+                    <div style={{ marginBottom: 16 }}>
+                        <div style={{ marginBottom: 4 }}>Logo Size</div>
+                        <input
+                            type="range"
+                            min={24}
+                            max={128}
+                            value={config.themes.logoSize ? parseInt(config.themes.logoSize) : 40}
+                            onChange={e => updateTheme("logoSize", `${e.target.value}px`)}
+                            style={{ width: "100%" }}
+                        />
+                        <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
+                            {config.themes.logoSize || "40px"}
                         </div>
                     </div>
 
-                    {/* Fourth Row: Top & Bottom Padding | Menu Font Style */}
-                    <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
-                        <div>
-                            <div style={{ marginBottom: 4 }}>Top & Bottom Padding</div>
-                            <input
-                                type="range"
-                                min={8}
-                                max={32}
-                                step={1}
-                                value={config.themes.padding_top_bottom ? parseInt(config.themes.padding_top_bottom) : 0}
-                                onChange={e => updateTheme('padding_top_bottom', `${e.target.value}px`)}
-                                style={{ width: "100%" }}
-                            />
-                            <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
-                                {config.themes.padding_top_bottom || "0px"}
-                            </div>
-                        </div>
-                        <div>
-                            
+                    {/* Top & Bottom Padding */}
+                    <div style={{ marginBottom: 20 }}>
+                        <div style={{ marginBottom: 4 }}>Top & Bottom Padding</div>
+                        <input
+                            type="range"
+                            min={8}
+                            max={32}
+                            step={1}
+                            value={config.themes.padding_top_bottom ? parseInt(config.themes.padding_top_bottom) : 0}
+                            onChange={e => updateTheme('padding_top_bottom', `${e.target.value}px`)}
+                            style={{ width: "100%" }}
+                        />
+                        <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
+                            {config.themes.padding_top_bottom || "0px"}
                         </div>
                     </div>
 
                     {/* SharePoint Element Visibility Toggles */}
-                    <div style={{ marginTop: 20, marginBottom: 20 }}>
+                    <div style={{ marginBottom: 20 }}>
                         <h3 style={{ margin: '0 0 16px 0', fontSize: 16, fontWeight: 600 }}>
                             SharePoint Element Visibility
                         </h3>
                         
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                            {/* Default Header Toggle */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ fontSize: 14 }}>{config.themes.is_sp_header ? 'Hide' : 'Show'} Default Header</span>
-                                <Toggle
-                                    checked={config.themes.is_sp_header}
-                                    onChange={(_e, checked) => updateTheme('is_sp_header', !!checked)}
-                                    styles={{
-                                        root: { marginBottom: 0 }
-                                    }}
-                                />
-                            </div>
+                        {/* Default Header Toggle */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                            <span style={{ fontSize: 14 }}>{config.themes.is_sp_header ? 'Hide' : 'Show'} Default Header</span>
+                            <Toggle
+                                checked={config.themes.is_sp_header}
+                                onChange={(_e, checked) => updateTheme('is_sp_header', !!checked)}
+                                styles={{
+                                    root: { marginBottom: 0 }
+                                }}
+                            />
+                        </div>
 
-                            {/* Suite Navigation Toggle */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ fontSize: 14 }}>{config.themes.is_suite_nav ? 'Hide' : 'Show'} Suite Navigation</span>
-                                <Toggle
-                                    checked={config.themes.is_suite_nav}
-                                    onChange={(_e, checked) => updateTheme('is_suite_nav', !!checked)}
-                                    styles={{
-                                        root: { marginBottom: 0 }
-                                    }}
-                                />
-                            </div>
+                        {/* Suite Navigation Toggle */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                            <span style={{ fontSize: 14 }}>{config.themes.is_suite_nav ? 'Hide' : 'Show'} Suite Navigation</span>
+                            <Toggle
+                                checked={config.themes.is_suite_nav}
+                                onChange={(_e, checked) => updateTheme('is_suite_nav', !!checked)}
+                                styles={{
+                                    root: { marginBottom: 0 }
+                                }}
+                            />
+                        </div>
 
-                            {/* Command Bar Toggle */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ fontSize: 14 }}>{config.themes.is_command_bar ? 'Hide' : 'Show'} Command Bar</span>
-                                <Toggle
-                                    checked={config.themes.is_command_bar}
-                                    onChange={(_e, checked) => updateTheme('is_command_bar', !!checked)}
-                                    styles={{
-                                        root: { marginBottom: 0 }
-                                    }}
-                                />
-                            </div>
+                        {/* Command Bar Toggle */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                            <span style={{ fontSize: 14 }}>{config.themes.is_command_bar ? 'Hide' : 'Show'} Command Bar</span>
+                            <Toggle
+                                checked={config.themes.is_command_bar}
+                                onChange={(_e, checked) => updateTheme('is_command_bar', !!checked)}
+                                styles={{
+                                    root: { marginBottom: 0 }
+                                }}
+                            />
+                        </div>
 
-                            {/* App Bar Toggle */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ fontSize: 14 }}>{config.themes.is_app_bar ? 'Hide' : 'Show'} App Bar</span>
-                                <Toggle
-                                    checked={config.themes.is_app_bar}
-                                    onChange={(_e, checked) => updateTheme('is_app_bar', !!checked)}
-                                    styles={{
-                                        root: { marginBottom: 0 }
-                                    }}
-                                />
-                            </div>
+                        {/* App Bar Toggle */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                            <span style={{ fontSize: 14 }}>{config.themes.is_app_bar ? 'Hide' : 'Show'} App Bar</span>
+                            <Toggle
+                                checked={config.themes.is_app_bar}
+                                onChange={(_e, checked) => updateTheme('is_app_bar', !!checked)}
+                                styles={{
+                                    root: { marginBottom: 0 }
+                                }}
+                            />
                         </div>
                     </div>
 
@@ -266,59 +245,55 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                         marginTop: 20, 
                         display: "flex", 
                         gap: 12, 
-                        padding: "0",
                         justifyContent: "flex-end",
                         alignItems: "center"
                     }}>
-                        {/* Action buttons */}
-                        <div style={{ display: "flex", gap: 8 }}>
-                            <button
-                                style={{
-                                    backgroundColor: "#f3f2f1",
-                                    color: "#323130",
-                                    border: "1px solid #d2d0ce",
-                                    borderRadius: 2,
-                                    padding: "6px 16px",
-                                    fontSize: 14,
-                                    cursor: "pointer"
-                                }}
-                                onClick={handleReload}
-                                disabled={isLoading || isSaving}
-                                title="Reload configuration from SharePoint"
-                            >
-                                🔄 Reload
-                            </button>
-                            <button
-                                style={{
-                                    backgroundColor: "#f3f2f1",
-                                    color: "#323130",
-                                    border: "1px solid #d2d0ce",
-                                    borderRadius: 2,
-                                    padding: "6px 16px",
-                                    fontSize: 14,
-                                    cursor: "pointer"
-                                }}
-                                onClick={handleCancel}
-                                disabled={isSaving}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                style={{
-                                    backgroundColor: hasUnsavedChanges ? "#0078d4" : "#d2d0ce",
-                                    color: hasUnsavedChanges ? "#ffffff" : "#a19f9d",
-                                    border: `1px solid ${hasUnsavedChanges ? "#0078d4" : "#d2d0ce"}`,
-                                    borderRadius: 2,
-                                    padding: "6px 16px",
-                                    fontSize: 14,
-                                    cursor: hasUnsavedChanges && !isSaving ? "pointer" : "default"
-                                }}
-                                onClick={handleSave}
-                                disabled={!hasUnsavedChanges || isSaving}
-                            >
-                                {isSaving ? "Saving..." : "Save"}
-                            </button>
-                        </div>
+                        <button
+                            style={{
+                                backgroundColor: "#f3f2f1",
+                                color: "#323130",
+                                border: "1px solid #d2d0ce",
+                                borderRadius: 2,
+                                padding: "6px 16px",
+                                fontSize: 14,
+                                cursor: "pointer"
+                            }}
+                            onClick={handleReload}
+                            disabled={isLoading || isSaving}
+                            title="Reload configuration from SharePoint"
+                        >
+                            🔄 Reload
+                        </button>
+                        <button
+                            style={{
+                                backgroundColor: "#f3f2f1",
+                                color: "#323130",
+                                border: "1px solid #d2d0ce",
+                                borderRadius: 2,
+                                padding: "6px 16px",
+                                fontSize: 14,
+                                cursor: "pointer"
+                            }}
+                            onClick={handleCancel}
+                            disabled={isSaving}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            style={{
+                                backgroundColor: hasUnsavedChanges ? "#0078d4" : "#d2d0ce",
+                                color: hasUnsavedChanges ? "#ffffff" : "#a19f9d",
+                                border: `1px solid ${hasUnsavedChanges ? "#0078d4" : "#d2d0ce"}`,
+                                borderRadius: 2,
+                                padding: "6px 16px",
+                                fontSize: 14,
+                                cursor: hasUnsavedChanges && !isSaving ? "pointer" : "default"
+                            }}
+                            onClick={handleSave}
+                            disabled={!hasUnsavedChanges || isSaving}
+                        >
+                            {isSaving ? "Saving..." : "Save"}
+                        </button>
                     </div>
                 </div>
             </Modal>
