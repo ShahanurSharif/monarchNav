@@ -3,7 +3,7 @@
   "solution": {
     "name": "monarch-nav-v2",
     "id": "2b91ae2f-6705-42d4-80aa-f88af14052eb",
-    "version": "2.1.5.0",
+    "version": "2.1.6.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
