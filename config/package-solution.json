@@ -3,7 +3,7 @@
   "solution": {
     "name": "monarch-nav-theme",
     "id": "4cd29abd-f439-4525-acca-f7849d4e3620",
-    "version": "2.1.1.4",
+    "version": "2.1.4.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
