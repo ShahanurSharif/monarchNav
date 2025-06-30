@@ -379,6 +379,7 @@ const Container: React.FC<IContainerProps> = (props) => {
     const padding_left_right = config.themes.padding_left_right;
     const fontSize = parseInt(config.themes.items_font_size.replace('px', ''));
     const fontStyle = config.themes.fontStyle || "normal";
+    const itemsAlignment = config.themes.items_alignment || "left";
     const homeUrl = props.context.pageContext.web.absoluteUrl;
 
     // Update CSS custom properties for mobile menu
@@ -428,6 +429,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                         display: "flex",
                         alignItems: "center",
                         gap: 8,
+                        flex: 1
                     }}
                 >
                     {/* Only one Settings and Add Navigation button group to the left of the logo */}
@@ -491,8 +493,10 @@ const Container: React.FC<IContainerProps> = (props) => {
                                 fontSize: fontSize,
                                 display: "flex",
                                 alignItems: "center",
+                                justifyContent: itemsAlignment === "left" ? "flex-start" : itemsAlignment === "center" ? "center" : "flex-end",
                                 gap: 16,
                                 padding: "4px 8px",
+                                flex: 1
                             }}
                         >
                             {/* Enhanced hierarchical navigation with dropdown menus */}
@@ -522,7 +526,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         fontWeight: fontStyle === "bold" ? "bold" : "normal",
                                         fontStyle: fontStyle === "italic" ? "italic" : "normal",
                                         cursor: "pointer",
-                                        padding: `8px ${parseInt(padding_left_right || "16px") / 1.33}px`,
+                                        padding: `8px ${parseInt(padding_left_right || "8px") / 1.33}px`,
                                         borderRadius: 4,
                                         transition: "background-color 0.2s ease",
                                         display: "flex",
@@ -820,6 +824,80 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                                   )}
                                   </div>
                           ))}
+                          
+                          {/* Edit Navigation Button - moved inside monarchMenuItems */}
+                          {isEditActionsVisible ? (
+                              <DefaultButton
+                                  text="Close"
+                                  iconProps={{ iconName: "Cancel" }}
+                                  title="Exit Edit Mode"
+                                  onClick={() => {
+                                      setIsEditActionsVisible(!isEditActionsVisible);
+                                      setIsSettingsCalloutVisible(false);
+                                  }}
+                                  styles={{
+                                      root: {
+                                          opacity: 0.8,
+                                          background: "rgba(220,53,69,0.15)",
+                                          color: "#dc3545",
+                                          border: "1px solid rgba(220,53,69,0.3)",
+                                          borderRadius: 3,
+                                          height: 32,
+                                          minWidth: 60,
+                                          transition: "all 0.2s ease"
+                                      },
+                                      rootHovered: {
+                                          opacity: 1,
+                                          background: "rgba(220,53,69,0.2)",
+                                          borderColor: "rgba(220,53,69,0.4)",
+                                          transform: "scale(1.05)"
+                                      },
+                                      label: {
+                                          fontSize: 12,
+                                          color: "#dc3545"
+                                      },
+                                      icon: {
+                                          fontSize: 12,
+                                          color: "#dc3545"
+                                      }
+                                  }}
+                              />
+                          ) : (
+                              <IconButton
+                                  iconProps={{ iconName: "Edit" }}
+                                  title="Edit Navigation"
+                                  ariaLabel="Edit Navigation"
+                                  styles={{
+                                      root: {
+                                          opacity: 0.8,
+                                          background: "rgba(255,255,255,0.15)",
+                                          color: textColor,
+                                          border: "1px solid rgba(255,255,255,0.3)",
+                                          borderRadius: 3,
+                                          padding: 0,
+                                          height: 32,
+                                          width: 32,
+                                          minWidth: 32,
+                                          minHeight: 32,
+                                          transition: "all 0.2s ease"
+                                      },
+                                      rootHovered: {
+                                          opacity: 1,
+                                          background: "rgba(255,255,255,0.2)",
+                                          borderColor: "rgba(255,255,255,0.4)",
+                                          transform: "scale(1.05)"
+                                      },
+                                      icon: {
+                                          fontSize: 14,
+                                          color: textColor
+                                      }
+                                  }}
+                                  onClick={() => {
+                                      setIsEditActionsVisible(!isEditActionsVisible);
+                                      setIsSettingsCalloutVisible(false);
+                                  }}
+                              />
+                          )}
                           </div>
                     )}
 
@@ -841,78 +919,6 @@ const Container: React.FC<IContainerProps> = (props) => {
                                 }
                             }}
                             onClick={() => setIsMobileMenuOpen(true)}
-                        />
-                    )}
-                    {isEditActionsVisible ? (
-                        <DefaultButton
-                            text="Close"
-                            iconProps={{ iconName: "Cancel" }}
-                            title="Exit Edit Mode"
-                            onClick={() => {
-                                setIsEditActionsVisible(!isEditActionsVisible);
-                                setIsSettingsCalloutVisible(false);
-                            }}
-                            styles={{
-                                root: {
-                                    opacity: 0.8,
-                                    background: "rgba(220,53,69,0.15)",
-                                    color: "#dc3545",
-                                    border: "1px solid rgba(220,53,69,0.3)",
-                                    borderRadius: 3,
-                                    height: 32,
-                                    minWidth: 60,
-                                    transition: "all 0.2s ease"
-                                },
-                                rootHovered: {
-                                    opacity: 1,
-                                    background: "rgba(220,53,69,0.2)",
-                                    borderColor: "rgba(220,53,69,0.4)",
-                                    transform: "scale(1.05)"
-                                },
-                                label: {
-                                    fontSize: 12,
-                                    color: "#dc3545"
-                                },
-                                icon: {
-                                    fontSize: 12,
-                                    color: "#dc3545"
-                                }
-                            }}
-                        />
-                    ) : (
-                        <IconButton
-                            iconProps={{ iconName: "Edit" }}
-                            title="Edit Navigation"
-                            ariaLabel="Edit Navigation"
-                            styles={{
-                                root: {
-                                    opacity: 0.8,
-                                    background: "rgba(255,255,255,0.15)",
-                                    color: textColor,
-                                    border: "1px solid rgba(255,255,255,0.3)",
-                                    borderRadius: 3,
-                                    padding: 0,
-                                    height: 32,
-                                    width: 32,
-                                    minWidth: 32,
-                                    minHeight: 32,
-                                    transition: "all 0.2s ease"
-                                },
-                                rootHovered: {
-                                    opacity: 1,
-                                    background: "rgba(255,255,255,0.2)",
-                                    borderColor: "rgba(255,255,255,0.4)",
-                                    transform: "scale(1.05)"
-                                },
-                                icon: {
-                                    fontSize: 14,
-                                    color: textColor
-                                }
-                            }}
-                            onClick={() => {
-                                setIsEditActionsVisible(!isEditActionsVisible);
-                                setIsSettingsCalloutVisible(false);
-                            }}
                         />
                     )}
                 </div>

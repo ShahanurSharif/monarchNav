@@ -169,16 +169,34 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                             </div>
                         </div>
                         <div>
-                            <div style={{ marginBottom: 4 }}>Menu Font Style</div>
-                            <select
-                                value={config.themes.fontStyle || "normal"}
-                                onChange={e => updateTheme("fontStyle", e.target.value)}
-                                style={{ width: "100%", padding: "6px", borderRadius: 2 }}
-                            >
-                                <option value="normal">Normal</option>
-                                <option value="bold">Bold</option>
-                                <option value="italic">Italic</option>
-                            </select>
+                            {/* Menu Font Style and Align Menu Items side by side */}
+                            <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ marginBottom: 4 }}>Menu Font Style</div>
+                                    <select
+                                        value={config.themes.fontStyle || "normal"}
+                                        onChange={e => updateTheme("fontStyle", e.target.value)}
+                                        style={{ width: "100%", padding: "6px", borderRadius: 2 }}
+                                    >
+                                        <option value="normal">Normal</option>
+                                        <option value="bold">Bold</option>
+                                        <option value="italic">Italic</option>
+                                    </select>
+                                </div>
+                                
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ marginBottom: 4 }}>Align Menu Items</div>
+                                    <select
+                                        value={config.themes.items_alignment || "left"}
+                                        onChange={e => updateTheme("items_alignment", e.target.value)}
+                                        style={{ width: "100%", padding: "6px", borderRadius: 2 }}
+                                    >
+                                        <option value="left">Left</option>
+                                        <option value="center">Center</option>
+                                        <option value="right">Right</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -206,12 +224,12 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                                 min={8}
                                 max={32}
                                 step={1}
-                                value={config.themes.padding_left_right ? parseInt(config.themes.padding_left_right) : 16}
+                                value={config.themes.padding_left_right ? parseInt(config.themes.padding_left_right) : 8}
                                 onChange={e => updateTheme('padding_left_right', `${e.target.value}px`)}
                                 style={{ width: "100%" }}
                             />
                             <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
-                                {config.themes.padding_left_right || "16px"}
+                                {config.themes.padding_left_right || "8px"}
                             </div>
                         </div>
                     </div>

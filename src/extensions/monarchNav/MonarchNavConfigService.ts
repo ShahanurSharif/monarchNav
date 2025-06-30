@@ -26,6 +26,7 @@ export interface IMonarchNavConfig {
     padding_top_bottom: string;
     padding_left_right: string;
     fontStyle: string;
+    items_alignment: string;
   };
   items: IMonarchNavItem[];
 }
@@ -42,9 +43,10 @@ const FALLBACK_CONFIG: IMonarchNavConfig = {
     items_font_size: "18px",
     logoUrl: "/SiteAssets/MonarchNav.png",
     logoSize: "40px",
-    padding_top_bottom: "12px",
-    padding_left_right: "16px",
-    fontStyle: "normal"
+    padding_top_bottom: "8px",
+    padding_left_right: "8px",
+    fontStyle: "normal",
+    items_alignment: "left"
   },
   items: [
     {
