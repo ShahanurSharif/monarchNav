@@ -376,6 +376,7 @@ const Container: React.FC<IContainerProps> = (props) => {
     const backgroundColor = config.themes.backgroundColor;
     const textColor = config.themes.textColor;
     const padding_top_bottom = config.themes.padding_top_bottom;
+    const padding_left_right = config.themes.padding_left_right;
     const fontSize = parseInt(config.themes.items_font_size.replace('px', ''));
     const fontStyle = config.themes.fontStyle || "normal";
     const homeUrl = props.context.pageContext.web.absoluteUrl;
@@ -521,7 +522,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                         fontWeight: fontStyle === "bold" ? "bold" : "normal",
                                         fontStyle: fontStyle === "italic" ? "italic" : "normal",
                                         cursor: "pointer",
-                                        padding: "8px 12px",
+                                        padding: `8px ${parseInt(padding_left_right || "16px") / 1.33}px`,
                                         borderRadius: 4,
                                         transition: "background-color 0.2s ease",
                                         display: "flex",
@@ -567,7 +568,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                 >
                                     {/* Parent icon and text */}
                                     {item.name}
-                                    {isEditActionsVisible && (
+                                    {isEditActionsVisible && !isSettingsCalloutVisible && (
                                         <>
                                             <IconButton
                                                 iconProps={{ iconName: "Edit" }}
@@ -736,9 +737,9 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                             }}>
                                                                 {childItem.description}
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                    {isEditActionsVisible && (
+                                                                                                            )}
+                                                </div>
+                                                    {isEditActionsVisible && !isSettingsCalloutVisible && (
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 12, flexShrink: 0 }}>
                                                             <IconButton
                                                                 iconProps={{ iconName: "Edit" }}

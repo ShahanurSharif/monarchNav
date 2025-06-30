@@ -182,7 +182,7 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                         </div>
                     </div>
 
-                    {/* Fourth Row: Top & Bottom Padding | Menu Font Style */}
+                    {/* Fourth Row: Top & Bottom Padding | Left & Right Padding */}
                     <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
                         <div>
                             <div style={{ marginBottom: 4 }}>Top & Bottom Padding</div>
@@ -200,7 +200,19 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                             </div>
                         </div>
                         <div>
-                            
+                            <div style={{ marginBottom: 4 }}>Left & Right Padding</div>
+                            <input
+                                type="range"
+                                min={8}
+                                max={32}
+                                step={1}
+                                value={config.themes.padding_left_right ? parseInt(config.themes.padding_left_right) : 16}
+                                onChange={e => updateTheme('padding_left_right', `${e.target.value}px`)}
+                                style={{ width: "100%" }}
+                            />
+                            <div style={{ textAlign: "right", fontSize: 12, marginTop: 2 }}>
+                                {config.themes.padding_left_right || "16px"}
+                            </div>
                         </div>
                     </div>
 
