@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Modal, Toggle, ColorPicker, Callout } from '@fluentui/react';
+import { Modal, Toggle, ColorPicker, Callout, IconButton } from '@fluentui/react';
 import { IMonarchNavConfig } from '../MonarchNavConfigService';
+import { BaseApplicationCustomizer } from '@microsoft/sp-application-base';
 
 export interface IThemeModalProps {
     isOpen: boolean;
@@ -17,6 +18,7 @@ export interface IThemeModalProps {
     backgroundColor: string;
     textColor: string;
     fontSize: number;
+    context?: BaseApplicationCustomizer<unknown>["context"]; // Add context prop for site URL
 }
 
 export const ThemeModal: React.FC<IThemeModalProps> = ({
@@ -33,7 +35,8 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
     error,
     backgroundColor,
     textColor,
-    fontSize
+    fontSize,
+    context
 }) => {
     // Color picker callout states
     const [isBackgroundColorCalloutVisible, setIsBackgroundColorCalloutVisible] = React.useState(false);
@@ -41,6 +44,21 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
 
     const backgroundColorButtonRef = React.useRef<HTMLButtonElement>(null);
     const textColorButtonRef = React.useRef<HTMLButtonElement>(null);
+
+    // Get dynamic site URL for logo
+    const getSiteUrl = (): string => {
+        if (context?.pageContext?.web?.absoluteUrl) {
+            return context.pageContext.web.absoluteUrl;
+        }
+        return window.location.origin;
+    };
+
+    // Handle logo deletion
+    const handleDeleteLogo = (): void => {
+        if (window.confirm('Are you sure you want to delete the logo?')) {
+            updateTheme("logoUrl", "");
+        }
+    };
 
     return (
         <>
@@ -107,18 +125,52 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                     <div className="theme-modal-two-column" style={{ marginBottom: 20 }}>
                         <div>
                             <div style={{ marginBottom: 4 }}>Header Logo</div>
-                            <img
-                                src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
-                                alt="Logo"
-                                style={{
-                                    height: config.themes.logoSize || "40px",
-                                    width: "auto",
-                                    marginBottom: 8,
-                                    borderRadius: 4,
-                                    background: "#fff",
-                                    border: "1px solid #eee"
-                                }}
-                            />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                                <img
+                                    src={config.themes.logoUrl || `${getSiteUrl()}/SiteAssets/MonarchNav.png`}
+                                    alt="Logo"
+                                    style={{
+                                        height: config.themes.logoSize || "40px",
+                                        width: "auto",
+                                        borderRadius: 4,
+                                        background: "#fff",
+                                        border: "1px solid #eee"
+                                    }}
+                                />
+                                {config.themes.logoUrl && (
+                                    <IconButton
+                                        iconProps={{ iconName: "Delete" }}
+                                        title="Delete Logo"
+                                        ariaLabel="Delete Logo"
+                                        onClick={handleDeleteLogo}
+                                        styles={{
+                                            root: {
+                                                opacity: 0.8,
+                                                background: "rgba(255,245,245,0.9)",
+                                                color: "#e53e3e",
+                                                border: "1px solid rgba(254,215,215,0.8)",
+                                                borderRadius: 4,
+                                                padding: 0,
+                                                height: 32,
+                                                width: 32,
+                                                minWidth: 32,
+                                                minHeight: 32,
+                                                transition: "all 0.15s ease"
+                                            },
+                                            rootHovered: {
+                                                opacity: 1,
+                                                background: "rgba(254,215,215,0.95)",
+                                                borderColor: "rgba(254,178,178,0.9)",
+                                                transform: "scale(1.05)"
+                                            },
+                                            icon: {
+                                                fontSize: 14,
+                                                color: "#e53e3e"
+                                            }
+                                        }}
+                                    />
+                                )}
+                            </div>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -242,7 +294,7 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                         
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                             {/* Default Header Toggle */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                                 <span style={{ fontSize: 14 }}>{config.themes.is_sp_header ? 'Hide' : 'Show'} Default Header</span>
                                 <Toggle
                                     checked={config.themes.is_sp_header}
@@ -254,7 +306,7 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                             </div>
 
                             {/* Suite Navigation Toggle */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                                 <span style={{ fontSize: 14 }}>{config.themes.is_suite_nav ? 'Hide' : 'Show'} Suite Navigation</span>
                                 <Toggle
                                     checked={config.themes.is_suite_nav}
@@ -266,7 +318,7 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                             </div>
 
                             {/* Command Bar Toggle */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                                 <span style={{ fontSize: 14 }}>{config.themes.is_command_bar ? 'Hide' : 'Show'} Command Bar</span>
                                 <Toggle
                                     checked={config.themes.is_command_bar}
@@ -278,7 +330,7 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                             </div>
 
                             {/* App Bar Toggle */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                                 <span style={{ fontSize: 14 }}>{config.themes.is_app_bar ? 'Hide' : 'Show'} App Bar</span>
                                 <Toggle
                                     checked={config.themes.is_app_bar}

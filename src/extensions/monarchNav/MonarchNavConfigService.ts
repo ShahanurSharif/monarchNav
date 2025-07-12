@@ -41,7 +41,7 @@ const FALLBACK_CONFIG: IMonarchNavConfig = {
     is_command_bar: true,
     is_app_bar: true,
     items_font_size: "18px",
-    logoUrl: "/SiteAssets/MonarchNav.png",
+    logoUrl: "",
     logoSize: "40px",
     padding_top_bottom: "8px",
     padding_left_right: "8px",

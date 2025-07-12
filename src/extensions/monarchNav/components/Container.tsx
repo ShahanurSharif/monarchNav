@@ -454,16 +454,27 @@ const Container: React.FC<IContainerProps> = (props) => {
                         </>
                     )}
                     {/* Logo */}
-                    <img
-                        src={config.themes.logoUrl || "/SiteAssets/MonarchNav.png"}
-                        alt="Logo"
+                    <a
+                        href={props.context.pageContext.web.absoluteUrl}
                         style={{
-                            height: config.themes.logoSize || "40px",
-                            width: "auto",
-                            marginRight: 16,
-                            background: "transparent"
+                            textDecoration: "none",
+                            display: "flex",
+                            alignItems: "center"
                         }}
-                    />
+                        title="Go to site home"
+                    >
+                        <img
+                            src={config.themes.logoUrl || `${props.context.pageContext.web.absoluteUrl}/SiteAssets/MonarchNav.png`}
+                            alt="Logo"
+                            style={{
+                                height: config.themes.logoSize || "40px",
+                                width: "auto",
+                                marginRight: 16,
+                                background: "transparent",
+                                cursor: "pointer"
+                            }}
+                        />
+                    </a>
                     {isEditActionsVisible && (
                         <>
                             <ThemeModal
@@ -481,6 +492,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                 backgroundColor={backgroundColor}
                                 textColor={textColor}
                                 fontSize={fontSize}
+                                context={props.context}
                             />
                         </>
                     )}
