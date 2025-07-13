@@ -6,6 +6,7 @@ import { useNavigationManager } from "../hooks/useNavigationManager";
 import { MonarchNavConfigService } from "../MonarchNavConfigService";
 import { ThemeModal } from "./ThemeModal";
 import { NavModal } from "./NavModal";
+import { PermissionUtils } from "../utils/permissionUtils";
 
 const Container: React.FC<IContainerProps> = (props) => {
     // Mobile responsive state
@@ -188,6 +189,18 @@ const Container: React.FC<IContainerProps> = (props) => {
     // UI state
     const [isSettingsCalloutVisible, setIsSettingsCalloutVisible] = React.useState(false);
     const [isEditActionsVisible, setIsEditActionsVisible] = React.useState(false);
+
+    // Check user permissions for editing
+    const canUserEdit = React.useMemo(() => {
+        return PermissionUtils.canUserEdit(props.context);
+    }, [props.context]);
+
+    // Log user permissions for debugging
+    React.useEffect(() => {
+        const userName = PermissionUtils.getUserDisplayName(props.context);
+        const userEmail = PermissionUtils.getUserEmail(props.context);
+        console.log(`MonarchNav: User ${userName} (${userEmail}) can edit: ${canUserEdit}`);
+    }, [canUserEdit, props.context]);
 
     const settingsButtonRef = React.useRef<IButton>(null);
     const navigationButtonRef = React.useRef<IButton>(null);
@@ -433,7 +446,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                     }}
                 >
                     {/* Only one Settings and Add Navigation button group to the left of the logo */}
-                    {isEditActionsVisible && (
+                    {isEditActionsVisible && canUserEdit && (
                         <>
                             <DefaultButton
                                 componentRef={settingsButtonRef}
@@ -454,28 +467,30 @@ const Container: React.FC<IContainerProps> = (props) => {
                         </>
                     )}
                     {/* Logo */}
-                    <a
-                        href={props.context.pageContext.web.absoluteUrl}
-                        style={{
-                            textDecoration: "none",
-                            display: "flex",
-                            alignItems: "center"
-                        }}
-                        title="Go to site home"
-                    >
-                        <img
-                            src={config.themes.logoUrl || `${props.context.pageContext.web.absoluteUrl}/SiteAssets/MonarchNav.png`}
-                            alt="Logo"
+                    {(config.themes.logoUrl && config.themes.logoUrl.trim() !== "") && (
+                        <a
+                            href={props.context.pageContext.web.absoluteUrl}
                             style={{
-                                height: config.themes.logoSize || "40px",
-                                width: "auto",
-                                marginRight: 16,
-                                background: "transparent",
-                                cursor: "pointer"
+                                textDecoration: "none",
+                                display: "flex",
+                                alignItems: "center"
                             }}
-                        />
-                    </a>
-                    {isEditActionsVisible && (
+                            title="Go to site home"
+                        >
+                            <img
+                                src={config.themes.logoUrl}
+                                alt="Logo"
+                                style={{
+                                    height: config.themes.logoSize || "40px",
+                                    width: "auto",
+                                    marginRight: 16,
+                                    background: "transparent",
+                                    cursor: "pointer"
+                                }}
+                            />
+                        </a>
+                    )}
+                    {isEditActionsVisible && canUserEdit && (
                         <>
                             <ThemeModal
                                 isOpen={isSettingsCalloutVisible}
@@ -584,7 +599,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                 >
                                     {/* Parent icon and text */}
                                     {item.name}
-                                    {isEditActionsVisible && !isSettingsCalloutVisible && (
+                                    {isEditActionsVisible && !isSettingsCalloutVisible && canUserEdit && (
                                         <>
                                             <IconButton
                                                 iconProps={{ iconName: "Edit" }}
@@ -755,7 +770,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                                             </div>
                                                                                                             )}
                                                 </div>
-                                                    {isEditActionsVisible && !isSettingsCalloutVisible && (
+                                                    {isEditActionsVisible && !isSettingsCalloutVisible && canUserEdit && (
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 12, flexShrink: 0 }}>
                                                             <IconButton
                                                                 iconProps={{ iconName: "Edit" }}
@@ -838,7 +853,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                           ))}
                           
                           {/* Edit Navigation Button - moved inside monarchMenuItems */}
-                          {isEditActionsVisible ? (
+                          {canUserEdit && (isEditActionsVisible ? (
                               <DefaultButton
                                   text="Close"
                                   iconProps={{ iconName: "Cancel" }}
@@ -909,7 +924,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                                       setIsSettingsCalloutVisible(false);
                                   }}
                               />
-                          )}
+                          ))}
                           </div>
                     )}
 
@@ -1043,7 +1058,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                         ))}
                         
                         {/* Mobile edit actions */}
-                        {isEditActionsVisible && (
+                        {isEditActionsVisible && canUserEdit && (
                             <div style={{ 
                                 padding: '20px', 
                                 borderTop: '1px solid rgba(255,255,255,0.1)',

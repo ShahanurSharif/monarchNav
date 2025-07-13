@@ -45,13 +45,7 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
     const backgroundColorButtonRef = React.useRef<HTMLButtonElement>(null);
     const textColorButtonRef = React.useRef<HTMLButtonElement>(null);
 
-    // Get dynamic site URL for logo
-    const getSiteUrl = (): string => {
-        if (context?.pageContext?.web?.absoluteUrl) {
-            return context.pageContext.web.absoluteUrl;
-        }
-        return window.location.origin;
-    };
+
 
     // Handle logo deletion
     const handleDeleteLogo = (): void => {
@@ -126,49 +120,67 @@ export const ThemeModal: React.FC<IThemeModalProps> = ({
                         <div>
                             <div style={{ marginBottom: 4 }}>Header Logo</div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                                <img
-                                    src={config.themes.logoUrl || `${getSiteUrl()}/SiteAssets/MonarchNav.png`}
-                                    alt="Logo"
-                                    style={{
+                                {config.themes.logoUrl && config.themes.logoUrl.trim() !== "" ? (
+                                    <>
+                                        <img
+                                            src={config.themes.logoUrl}
+                                            alt="Logo"
+                                            style={{
+                                                height: config.themes.logoSize || "40px",
+                                                width: "auto",
+                                                borderRadius: 4,
+                                                background: "#fff",
+                                                border: "1px solid #eee"
+                                            }}
+                                        />
+                                        <IconButton
+                                            iconProps={{ iconName: "Delete" }}
+                                            title="Delete Logo"
+                                            ariaLabel="Delete Logo"
+                                            onClick={handleDeleteLogo}
+                                            styles={{
+                                                root: {
+                                                    opacity: 0.8,
+                                                    background: "rgba(255,245,245,0.9)",
+                                                    color: "#e53e3e",
+                                                    border: "1px solid rgba(254,215,215,0.8)",
+                                                    borderRadius: 4,
+                                                    padding: 0,
+                                                    height: 32,
+                                                    width: 32,
+                                                    minWidth: 32,
+                                                    minHeight: 32,
+                                                    transition: "all 0.15s ease"
+                                                },
+                                                rootHovered: {
+                                                    opacity: 1,
+                                                    background: "rgba(254,215,215,0.95)",
+                                                    borderColor: "rgba(254,178,178,0.9)",
+                                                    transform: "scale(1.05)"
+                                                },
+                                                icon: {
+                                                    fontSize: 14,
+                                                    color: "#e53e3e"
+                                                }
+                                            }}
+                                        />
+                                    </>
+                                ) : (
+                                    <div style={{
                                         height: config.themes.logoSize || "40px",
                                         width: "auto",
                                         borderRadius: 4,
-                                        background: "#fff",
-                                        border: "1px solid #eee"
-                                    }}
-                                />
-                                {config.themes.logoUrl && (
-                                    <IconButton
-                                        iconProps={{ iconName: "Delete" }}
-                                        title="Delete Logo"
-                                        ariaLabel="Delete Logo"
-                                        onClick={handleDeleteLogo}
-                                        styles={{
-                                            root: {
-                                                opacity: 0.8,
-                                                background: "rgba(255,245,245,0.9)",
-                                                color: "#e53e3e",
-                                                border: "1px solid rgba(254,215,215,0.8)",
-                                                borderRadius: 4,
-                                                padding: 0,
-                                                height: 32,
-                                                width: 32,
-                                                minWidth: 32,
-                                                minHeight: 32,
-                                                transition: "all 0.15s ease"
-                                            },
-                                            rootHovered: {
-                                                opacity: 1,
-                                                background: "rgba(254,215,215,0.95)",
-                                                borderColor: "rgba(254,178,178,0.9)",
-                                                transform: "scale(1.05)"
-                                            },
-                                            icon: {
-                                                fontSize: 14,
-                                                color: "#e53e3e"
-                                            }
-                                        }}
-                                    />
+                                        background: "#f8f9fa",
+                                        border: "1px solid #dee2e6",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "#6c757d",
+                                        fontSize: "12px",
+                                        padding: "0 8px"
+                                    }}>
+                                        No Logo Set
+                                    </div>
                                 )}
                             </div>
                             <input
