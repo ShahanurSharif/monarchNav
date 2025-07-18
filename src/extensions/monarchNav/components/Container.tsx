@@ -177,7 +177,7 @@ const Container: React.FC<IContainerProps> = (props) => {
                 updateConfig(newConfig);
                 // Save the new config directly to avoid state timing issues
                 await MonarchNavConfigService.saveConfig(props.context, newConfig);
-                console.log('Navigation changes auto-saved successfully');
+                // console.log('Navigation changes auto-saved successfully');
             } catch (error) {
                 console.error('Failed to auto-save navigation changes:', error);
                 // TODO: Integrate a professional notification/toast system here
@@ -235,35 +235,81 @@ const Container: React.FC<IContainerProps> = (props) => {
         }
     }, [dropdownTimeouts]);
 
-    // Helper function to apply SharePoint header visibility
+    // Helper function to apply SharePoint header visibility with MutationObserver
     const applySpHeaderVisibility = React.useCallback((visible: boolean): void => {
         const possibleIds = [
             'spSiteHeader', 
-            'spHeader', 
-            // 'SuiteNavWrapper'
+            'spHeader'
         ];
-        
-        
-        for (const id of possibleIds) {
-            const spHeader = document.getElementById(id);
-            if (spHeader) {
-                spHeader.style.display = visible ? "" : "none";
-                console.log(`Applied SharePoint header visibility (${visible}) to element: ${id}`);
-                return;
-            }
-        }
-        
-        setTimeout(() => {
+        //sharepoint header classes
+        const possibleClasses = [
+            'od-TopBar-header',
+            'od-Files-topBar'
+        ];
+
+        // Function to try to find and apply visibility to header elements
+        const tryApplyVisibility = (): boolean => {
+            // Try IDs first
             for (const id of possibleIds) {
                 const spHeader = document.getElementById(id);
                 if (spHeader) {
                     spHeader.style.display = visible ? "" : "none";
-                    console.log(`Applied SharePoint header visibility (${visible}) to element: ${id} (delayed)`);
-                    return;
+                    // console.log(`Applied SharePoint header visibility (${visible}) to element: ${id}`);
+                    return true;
                 }
             }
-            console.warn('SharePoint header element not found with any of the expected IDs:', possibleIds);
-        }, 500);
+            
+            // Try classes if IDs not found
+            for (const className of possibleClasses) {
+                const spHeader = document.querySelector(`.${className}`) as HTMLElement;
+                if (spHeader) {
+                    spHeader.style.display = visible ? "" : "none";
+                    // console.log(`Applied SharePoint header visibility (${visible}) to class: ${className}`);
+                    return true;
+                }
+            }
+            
+            return false;
+        };
+
+        // Try immediately first
+        if (tryApplyVisibility()) {
+            return;
+        }
+
+        // If not found, set up MutationObserver to watch for DOM changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    // Check if any of our target elements were added
+                    if (tryApplyVisibility()) {
+                        observer.disconnect(); // Stop observing once found
+                        // console.log('Header element found and controlled via MutationObserver');
+                    }
+                }
+            });
+        });
+
+        // Start observing
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        // Set a timeout to stop observing after 10 seconds
+        setTimeout(() => {
+            observer.disconnect();
+            if (!tryApplyVisibility()) {
+                console.warn('SharePoint header element not found after 10 seconds of observation');
+            }
+        }, 10000);
+
+        // Also try with traditional timeout as fallback
+        setTimeout(() => {
+            if (tryApplyVisibility()) {
+                observer.disconnect();
+            }
+        }, 1000);
     }, []);
 
     // Helper function to apply Suite Navigation visibility
@@ -271,13 +317,13 @@ const Container: React.FC<IContainerProps> = (props) => {
         const element = document.getElementById('SuiteNavWrapper');
         if (element) {
             element.style.display = visible ? "" : "none";
-            console.log(`Applied Suite Navigation visibility (${visible}) to SuiteNavWrapper`);
+            // console.log(`Applied Suite Navigation visibility (${visible}) to SuiteNavWrapper`);
         } else {
             setTimeout(() => {
                 const delayedElement = document.getElementById('SuiteNavWrapper');
                 if (delayedElement) {
                     delayedElement.style.display = visible ? "" : "none";
-                    console.log(`Applied Suite Navigation visibility (${visible}) to SuiteNavWrapper (delayed)`);
+                    // console.log(`Applied Suite Navigation visibility (${visible}) to SuiteNavWrapper (delayed)`);
                 } else {
                     console.warn('SuiteNavWrapper element not found');
                 }
@@ -285,23 +331,67 @@ const Container: React.FC<IContainerProps> = (props) => {
         }
     }, []);
 
-    // Helper function to apply Command Bar visibility
+    // Helper function to apply Command Bar visibility with MutationObserver
     const applyCommandBarVisibility = React.useCallback((visible: boolean): void => {
-        const element = document.getElementById('spCommandBar');
-        if (element) {
-            element.style.display = visible ? "" : "none";
-            console.log(`Applied Command Bar visibility (${visible}) to spCommandBar`);
-        } else {
-            setTimeout(() => {
-                const delayedElement = document.getElementById('spCommandBar');
-                if (delayedElement) {
-                    delayedElement.style.display = visible ? "" : "none";
-                    console.log(`Applied Command Bar visibility (${visible}) to spCommandBar (delayed)`);
-                } else {
-                    console.warn('spCommandBar element not found');
-                }
-            }, 500);
+        // Function to try to find and apply visibility to command bar elements
+        const tryApplyVisibility = (): boolean => {
+            // Try frontend ID first
+            const element = document.getElementById('spCommandBar');
+            if (element) {
+                element.style.display = visible ? "" : "none";
+                // console.log(`Applied Command Bar visibility (${visible}) to spCommandBar`);
+                return true;
+            }
+            
+            // Try backend class if frontend ID not found
+            const backendElement = document.querySelector('.od-TopBar-commandBar') as HTMLElement;
+            if (backendElement) {
+                backendElement.style.display = visible ? "" : "none";
+                // console.log(`Applied Command Bar visibility (${visible}) to od-TopBar-commandBar`);
+                return true;
+            }
+            
+            return false;
+        };
+
+        // Try immediately first
+        if (tryApplyVisibility()) {
+            return;
         }
+
+        // If not found, set up MutationObserver to watch for DOM changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    // Check if any of our target elements were added
+                    if (tryApplyVisibility()) {
+                        observer.disconnect(); // Stop observing once found
+                        // console.log('Command Bar element found and controlled via MutationObserver');
+                    }
+                }
+            });
+        });
+
+        // Start observing
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        // Set a timeout to stop observing after 10 seconds
+        setTimeout(() => {
+            observer.disconnect();
+            if (!tryApplyVisibility()) {
+                console.warn('Command Bar element not found after 10 seconds of observation');
+            }
+        }, 10000);
+
+        // Also try with traditional timeout as fallback
+        setTimeout(() => {
+            if (tryApplyVisibility()) {
+                observer.disconnect();
+            }
+        }, 1000);
     }, []);
 
     // Helper function to apply App Bar visibility
@@ -309,13 +399,13 @@ const Container: React.FC<IContainerProps> = (props) => {
         const element = document.getElementById('sp-appBar');
         if (element) {
             element.style.display = visible ? "" : "none";
-            console.log(`Applied App Bar visibility (${visible}) to sp-appBar`);
+            // console.log(`Applied App Bar visibility (${visible}) to sp-appBar`);
         } else {
             setTimeout(() => {
                 const delayedElement = document.getElementById('sp-appBar');
                 if (delayedElement) {
                     delayedElement.style.display = visible ? "" : "none";
-                    console.log(`Applied App Bar visibility (${visible}) to sp-appBar (delayed)`);
+                    // console.log(`Applied App Bar visibility (${visible}) to sp-appBar (delayed)`);
                 } else {
                     console.warn('sp-appBar element not found');
                 }
@@ -335,7 +425,7 @@ const Container: React.FC<IContainerProps> = (props) => {
             setIsSettingsCalloutVisible(false);
             navigationManager.closeDialog(); // Close navigation dialog if open
             // TODO: Integrate a professional notification/toast system here
-            console.log("Settings saved successfully!");
+            // console.log("Settings saved successfully!");
         } catch {
             // TODO: Integrate a professional notification/toast system here
             console.error("Error saving settings. Please try again.");
