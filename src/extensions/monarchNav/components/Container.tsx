@@ -244,7 +244,8 @@ const Container: React.FC<IContainerProps> = (props) => {
         //sharepoint header classes
         const possibleClasses = [
             'od-TopBar-header',
-            'od-Files-topBar'
+            'od-Files-topBar',
+            'od-TopBar-header ',
         ];
 
         // Function to try to find and apply visibility to header elements
