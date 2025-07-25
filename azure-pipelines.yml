@@ -34,24 +34,28 @@ steps:
       npx gulp package-solution --ship
     displayName: 'Build, bundle and package SPFx solution'
 
-  - powershell: |
-      Install-Module -Name PnP.PowerShell -Force -AllowClobber -Scope CurrentUser
-      Import-Module PnP.PowerShell
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      pwsh: true
+      script: |
+        Install-Module -Name PnP.PowerShell -Force -AllowClobber -Scope CurrentUser
+        Import-Module PnP.PowerShell
 
-      Write-Host "Authenticating to SharePoint..."
-      Connect-PnPOnline -Url "$(SHAREPOINT_SITE_URL)" -ClientId "$(sharepointClientId)" -ClientSecret "$(sharepointClientSecret)"
+        Write-Host "Authenticating to SharePoint..."
+        Connect-PnPOnline -Url "$(SHAREPOINT_SITE_URL)" -ClientId "$(sharepointClientId)" -ClientSecret "$(sharepointClientSecret)"
 
-      Write-Host "Uploading app package..."
-      Add-PnPApp -Path "$(SPPKG_PATH)" -Scope Site -Publish -Overwrite
+        Write-Host "Uploading app package..."
+        Add-PnPApp -Path "$(SPPKG_PATH)" -Scope Site -Publish -Overwrite
 
-      Write-Host "Deploying app package (manual install, not tenant-wide)..."
-      $app = Get-PnPApp | Where-Object { $_.Name -eq "$(SPPKG_FILE)" }
-      if ($null -eq $app) {
-        Write-Host "Could not find uploaded app package!"
-        exit 1
-      }
+        Write-Host "Deploying app package (manual install, not tenant-wide)..."
+        $app = Get-PnPApp | Where-Object { $_.Name -eq "$(SPPKG_FILE)" }
+        if ($null -eq $app) {
+          Write-Host "Could not find uploaded app package!"
+          exit 1
+        }
 
-      Publish-PnPApp -Identity $app.Id -Scope Site -SkipFeatureDeployment
+        Publish-PnPApp -Identity $app.Id -Scope Site -SkipFeatureDeployment
 
-      Write-Host "App uploaded and deployed (not tenant-wide)!"
+        Write-Host "App uploaded and deployed (not tenant-wide)!"
     displayName: 'Deploy SPFx App to SharePoint App Catalog'
