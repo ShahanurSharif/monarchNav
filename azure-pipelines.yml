@@ -14,18 +14,11 @@ variables:
   SPPKG_PATH: '$(SOLUTION_FOLDER)/sharepoint/solution/$(SPPKG_FILE)'
   APP_CATALOG_URL: 'https://monarch360demo.sharepoint.com/sites/appcatalog'
   SHAREPOINT_SITE_URL: 'https://monarch360demo.sharepoint.com/sites/appcatalog'
-  SHAREPOINT_CLIENT_ID: '$(SHAREPOINT_CLIENT_ID)'
-  SHAREPOINT_CLIENT_SECRET: '$(SHAREPOINT_CLIENT_SECRET)'
 
 steps:
   - checkout: self
     fetchDepth: 0
     fetchTags: true
-
-  - script: |
-      echo "Checking out tag: $(Build.SourceBranch)"
-      git checkout $(Build.SourceBranch)
-    displayName: 'Checkout specific tag'
 
   - task: NodeTool@0
     inputs:
@@ -46,7 +39,7 @@ steps:
       Import-Module PnP.PowerShell
 
       Write-Host "Authenticating to SharePoint..."
-      Connect-PnPOnline -Url "$(SHAREPOINT_SITE_URL)" -ClientId "$(SHAREPOINT_CLIENT_ID)" -ClientSecret "$(SHAREPOINT_CLIENT_SECRET)"
+      Connect-PnPOnline -Url "$(SHAREPOINT_SITE_URL)" -ClientId "$(sharepointClientId)" -ClientSecret "$(sharepointClientSecret)"
 
       Write-Host "Uploading app package..."
       Add-PnPApp -Path "$(SPPKG_PATH)" -Scope Site -Publish -Overwrite
