@@ -1,4 +1,4 @@
-trigger: auto
+trigger:
   tags:
     include:
       - 'v*'
@@ -19,6 +19,13 @@ variables:
 
 steps:
   - checkout: self
+    fetchDepth: 0
+    fetchTags: true
+
+  - script: |
+      echo "Checking out tag: $(Build.SourceBranch)"
+      git checkout $(Build.SourceBranch)
+    displayName: 'Checkout specific tag'
 
   - task: NodeTool@0
     inputs:
@@ -31,10 +38,8 @@ steps:
   - script: |
       npx gulp build --ship
       npx gulp bundle --ship
-    displayName: 'Build and bundle solution'
-
-  - script: npx gulp package-solution --ship
-    displayName: 'Package SPFx solution'
+      npx gulp package-solution --ship
+    displayName: 'Build, bundle and package SPFx solution'
 
   - powershell: |
       Install-Module -Name PnP.PowerShell -Force -AllowClobber -Scope CurrentUser
@@ -57,9 +62,3 @@ steps:
 
       Write-Host "App uploaded and deployed (not tenant-wide)!"
     displayName: 'Deploy SPFx App to SharePoint App Catalog'
-    env:
-      SHAREPOINT_CLIENT_ID: $(sharepointClientId)
-      SHAREPOINT_CLIENT_SECRET: $(sharepointClientId)
-      SPPKG_FILE: $(SPPKG_FILE)
-      SPPKG_PATH: $(SPPKG_PATH)
-      SHAREPOINT_SITE_URL: $(SHAREPOINT_SITE_URL)
