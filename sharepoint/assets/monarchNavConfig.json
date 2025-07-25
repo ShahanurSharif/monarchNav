@@ -1,51 +1,63 @@
 {
     "themes": {
-        "backgroundColor": "#ffffff",
+        "backgroundColor": "#fcfcfc",
         "textColor": "#6c757d",
         "is_sp_header": true,
         "is_suite_nav": true,
         "is_command_bar": true,
         "is_app_bar": true,
-        "items_font_size": "18px",
-        "padding_top_bottom": "8px",
-        "padding_left_right": "8px",
+        "items_font_size": "12px",
         "logoUrl": "",
-        "logoSize": "40px",
+        "logoSize": "48px",
+        "padding_top_bottom": "8px",
         "fontStyle": "normal",
-        "items_alignment": "left"
+        "items_alignment": "left",
+        "padding_left_right": "9px"
     },
     "items": [
         {
-            "name": "Home",
-            "link": "",
-            "target": "_self",
-            "description": "Navigate to site home page"
-        },
-        {
-            "name": "Documents",
-            "link": "/Shared Documents",
-            "target": "_self",
-            "description": "Site documents library",
+            "name": "Corporate",
+            "link": "https://www.amazon.com.au/",
+            "target": "_blank",
+            "description": "Amazon",
             "children": [
                 {
-                    "name": "Policies",
-                    "link": "/Shared Documents/Policies",
-                    "target": "_self",
-                    "description": "Company policies and procedures"
+                    "name": "Finance",
+                    "link": "https://www.youtube.com/",
+                    "target": "_blank",
+                    "description": "Financial Report"
                 },
                 {
-                    "name": "Templates", 
-                    "link": "/Shared Documents/Templates",
-                    "target": "_self",
-                    "description": "Document templates"
+                    "name": "Human Resources",
+                    "link": "https://google.com",
+                    "target": "_blank",
+                    "description": "Human Resources Function"
                 }
             ]
         },
         {
-            "name": "Lists", 
-            "link": "/Lists",
+            "name": "Community",
+            "link": "https://www.msn.com/",
+            "target": "_blank",
+            "description": "Msn"
+        },
+        {
+            "name": "Development",
+            "link": "https://www.msn.com/",
+            "target": "_blank",
+            "description": "Monarch"
+        },
+        {
+            "name": "Infrastructure",
+            "link": "https://www.msn.com/",
+            "target": "_blank",
+            "description": "Monarch"
+        },
+        {
+            "name": "Executive",
+            "link": "https://www.msn.com/",
             "target": "_self",
-            "description": "Site lists"
+            "description": "https://www.msn.com/"
         }
     ]
 }

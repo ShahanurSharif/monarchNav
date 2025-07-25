@@ -1,0 +1,65 @@
+trigger: auto
+  tags:
+    include:
+      - 'v*'
+
+pr: none
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  SOLUTION_FOLDER: '$(System.DefaultWorkingDirectory)'
+  SPPKG_FILE: 'monarch-nav-theme.sppkg'
+  SPPKG_PATH: '$(SOLUTION_FOLDER)/sharepoint/solution/$(SPPKG_FILE)'
+  APP_CATALOG_URL: 'https://monarch360demo.sharepoint.com/sites/appcatalog'
+  SHAREPOINT_SITE_URL: 'https://monarch360demo.sharepoint.com/sites/appcatalog'
+  SHAREPOINT_CLIENT_ID: '$(SHAREPOINT_CLIENT_ID)'
+  SHAREPOINT_CLIENT_SECRET: '$(SHAREPOINT_CLIENT_SECRET)'
+
+steps:
+  - checkout: self
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x'
+    displayName: 'Install Node.js'
+
+  - script: npm ci
+    displayName: 'Install dependencies'
+
+  - script: |
+      npx gulp build --ship
+      npx gulp bundle --ship
+    displayName: 'Build and bundle solution'
+
+  - script: npx gulp package-solution --ship
+    displayName: 'Package SPFx solution'
+
+  - powershell: |
+      Install-Module -Name PnP.PowerShell -Force -AllowClobber -Scope CurrentUser
+      Import-Module PnP.PowerShell
+
+      Write-Host "Authenticating to SharePoint..."
+      Connect-PnPOnline -Url "$(SHAREPOINT_SITE_URL)" -ClientId "$(SHAREPOINT_CLIENT_ID)" -ClientSecret "$(SHAREPOINT_CLIENT_SECRET)"
+
+      Write-Host "Uploading app package..."
+      Add-PnPApp -Path "$(SPPKG_PATH)" -Scope Site -Publish -Overwrite
+
+      Write-Host "Deploying app package (manual install, not tenant-wide)..."
+      $app = Get-PnPApp | Where-Object { $_.Name -eq "$(SPPKG_FILE)" }
+      if ($null -eq $app) {
+        Write-Host "Could not find uploaded app package!"
+        exit 1
+      }
+
+      Publish-PnPApp -Identity $app.Id -Scope Site -SkipFeatureDeployment
+
+      Write-Host "App uploaded and deployed (not tenant-wide)!"
+    displayName: 'Deploy SPFx App to SharePoint App Catalog'
+    env:
+      SHAREPOINT_CLIENT_ID: $(sharepointClientId)
+      SHAREPOINT_CLIENT_SECRET: $(sharepointClientId)
+      SPPKG_FILE: $(SPPKG_FILE)
+      SPPKG_PATH: $(SPPKG_PATH)
+      SHAREPOINT_SITE_URL: $(SHAREPOINT_SITE_URL)
